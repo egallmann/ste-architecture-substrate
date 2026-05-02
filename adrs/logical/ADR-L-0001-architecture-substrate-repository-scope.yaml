@@ -1,0 +1,22 @@
+schema_version: '1.0'
+adr_type: logical
+id: ADR-L-0001
+title: Architecture substrate repository scope
+status: proposed
+created_date: '2026-01-01'
+authors:
+- adr-architecture-kit
+domains:
+- architecture
+context: Describe the architectural context and drivers.
+decisions:
+- id: DEC-0001
+  summary: Describe the core decision.
+  rationale: Explain why this decision is being made.
+capabilities: []
+architectural_boundaries: []
+interaction_contracts: []
+constraints: []
+invariants: []
+non_functional_requirements: []
+gaps: []

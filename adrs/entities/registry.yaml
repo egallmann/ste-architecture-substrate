@@ -1,0 +1,27 @@
+# integrity_schema_version: 1
+# generated: deterministic_projection_v1
+# artifact_kind: legacy_entity_registry
+# generator_id: adr-compiler
+# generator_version: 1
+# hash_algorithm: sha256
+# source_hash: fb7c4487750861d55303c434d6503735ca96c8358b241c1e7415232cbc86dcc9
+# rendered_hash: 8085a57f6443ca049112807b1ff8b3da1371fe577bcb287a1d0b01135bc8f289
+
+schema_version: '1.1'
+type: entity_registry
+entities:
+- entity_id: DEC-0001
+  entity_type: decision
+  name: Describe the core decision.
+  introduced_by: ADR-L-0001
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0001-architecture-substrate-repository-scope.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
