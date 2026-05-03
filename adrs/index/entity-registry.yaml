@@ -1,0 +1,82 @@
+schema_version: '1.1'
+type: normalized_entity_registry
+entities:
+- id: ADR-L-0001
+  entity_type: adr
+  name: Architecture substrate repository scope
+  summary: Describe the architectural context and drivers.
+  canonical_source:
+    source_type: logical_adr
+    source_ref: ADR-L-0001
+    artifact_path: adrs/logical/ADR-L-0001-architecture-substrate-repository-scope.yaml
+  source_refs: []
+  metadata:
+    status: proposed
+    domains:
+    - architecture
+    tags: []
+    implementation_authority: null
+    related_reviews: []
+    related_overrides: []
+  relationships:
+    declared_in: []
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in: []
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: logical_adr
+    source_ref: ADR-L-0001
+    extraction_phase: extract_adr
+    classification: explicit
+    generator: adr-architecture-index
+- id: DEC-0001
+  entity_type: decision
+  name: Describe the core decision.
+  summary: Explain why this decision is being made.
+  canonical_source:
+    source_type: logical_adr
+    source_ref: ADR-L-0001#DEC-0001
+    artifact_path: adrs/logical/ADR-L-0001-architecture-substrate-repository-scope.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-L-0001
+    related_invariants: []
+    enforces_invariants: []
+    enables_capabilities: []
+    governs_components: []
+    supersedes: []
+    refines: []
+  relationships:
+    declared_in:
+    - ADR-L-0001
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in: []
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: logical_adr
+    source_ref: ADR-L-0001#DEC-0001
+    extraction_phase: extract_decision
+    classification: explicit
+    generator: adr-architecture-index
