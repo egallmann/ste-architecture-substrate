@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0.0",
+  "metadata": {
+    "id": "cognito-auth",
+    "name": "Cognito Authentication",
+    "description": "Cognito User Pool with hosted UI domain and app client configured for OAuth2 Authorization Code flow. Extracted from reference-webapp.",
+    "version": "1.0.0",
+    "technology": "cloudformation",
+    "domains": ["auth", "identity"],
+    "tags": ["cognito", "oauth2", "userpool", "hosted-ui", "authentication"]
+  },
+  "adr_bundle": ["ADR-L-0001", "ADR-PS-0002"],
+  "adr_context_prose": "adr-context.md",
+  "mutation_rules": "mutation-rules.yaml",
+  "dependencies": ["static-site-delivery"],
+  "cloudformation": {
+    "template": "template.yaml",
+    "fragment_type": "resources",
+    "required_parameters": {
+      "AppName": {"type": "String", "description": "Name prefix for resources"},
+      "Env": {"type": "String", "description": "Environment name"},
+      "CallbackUrl": {"type": "String", "description": "OAuth2 redirect URI (typically CloudFront domain)"}
+    },
+    "exports": {
+      "UserPoolId": "Cognito User Pool ID",
+      "UserPoolArn": "Cognito User Pool ARN",
+      "AppClientId": "Cognito app client ID",
+      "CognitoDomain": "Cognito hosted UI domain prefix"
+    }
+  }
+}

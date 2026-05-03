@@ -1,0 +1,17 @@
+# Example mutation-rules sidecar for fixture seeds (non-authoritative).
+# Aligns with schemas/mutation-rules.schema.json logical-ID variant.
+
+immutable:
+  - SiteDistribution.DistributionConfig
+  - CognitoUserPool
+
+append_only:
+  - SiteWebACL.Properties.Rules
+
+required:
+  - SiteContentBucket
+  - RestApi
+
+metadata:
+  description: Example constraints for the aws-cloudformation-templates WebApp sample
+  enforcement_level: advisory

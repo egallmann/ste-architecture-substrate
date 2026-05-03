@@ -1,0 +1,207 @@
+schema_version: '1.0'
+adr_type: physical-component
+id: ADR-PC-0003
+title: CloudFormation Building Block Bundle Structure
+status: proposed
+created_date: '2026-05-02'
+authors:
+- Erik Gallmann
+implements_logical:
+- ADR-L-0001
+implements_system:
+- ADR-PS-0002
+domains:
+- cloudformation
+context: |
+  CloudFormation building block bundles are reusable, composable components that extend
+  seed architectures with additional capabilities. Unlike seeds, bundles include mutation
+  rules that define composition constraints and integration requirements.
+  
+  Key characteristics:
+  - Single CloudFormation template per bundle (focused scope)
+  - Mutation rules define composition constraints (immutable, append-only, required resources)
+  - Metadata includes ADR traceability
+  - Designed for composition into existing architectures
+  - Self-describing integration requirements
+component_specifications:
+  - id: COMP-0003
+    name: CloudFormation Bundle
+    type: library
+    responsibilities: |
+      - Define reusable CloudFormation building block structure
+      - Include mutation rules for composition
+      - Maintain ADR traceability
+    generation_context:
+      purpose: Define CloudFormation building block bundle structure
+      key_responsibilities:
+        - Bundle structure with mutation rules
+        - ADR context traceability
+        - Composition semantics
+      constraints:
+        - Must include mutation-rules.yaml
+    interfaces:
+      - id: IFACE-0003
+        type: library_api
+        specification: |
+          CloudFormation Bundle Structure:
+          
+          Directory structure:
+          ```
+          building-blocks/<bundle-name>/
+            metadata.json           # Bundle metadata with ADR references
+            template.yaml          # CloudFormation template
+            mutation-rules.yaml    # Composition constraints
+            README.md             # Optional: usage documentation
+          ```
+          
+          metadata.json structure:
+          ```json
+          {
+            "metadata": {
+              "id": "string (unique bundle identifier)",
+              "name": "string (human-readable name)",
+              "description": "string (purpose and capabilities)",
+              "version": "string (semver)",
+              "technology": "cloudformation",
+              "adr_references": ["ADR-L-XXXX", "ADR-PS-YYYY"],
+              "tags": ["optional", "categorization", "tags"]
+            },
+            "cloudformation": {
+              "template": "template.yaml",
+              "mutation_rules": "mutation-rules.yaml",
+              "required_parameters": {
+                "VpcId": {
+                  "type": "String",
+                  "description": "VPC ID where resources will be created"
+                }
+              },
+              "exports": {
+                "BucketName": "S3 bucket name",
+                "BucketArn": "S3 bucket ARN"
+              }
+            }
+          }
+          ```
+          
+          Example: S3 Bucket Bundle
+          ```
+          building-blocks/s3-secure-bucket/
+            metadata.json:
+            {
+              "metadata": {
+                "id": "s3-secure-bucket",
+                "name": "Secure S3 Bucket",
+                "description": "S3 bucket with encryption, versioning, and lifecycle policies",
+                "version": "1.0.0",
+                "technology": "cloudformation",
+                "adr_references": ["ADR-L-0001"],
+                "tags": ["storage", "s3", "security"]
+              },
+              "cloudformation": {
+                "template": "template.yaml",
+                "mutation_rules": "mutation-rules.yaml",
+                "required_parameters": {
+                  "BucketPrefix": {
+                    "type": "String",
+                    "description": "Prefix for bucket name"
+                  }
+                },
+                "exports": {
+                  "BucketName": "Name of created S3 bucket",
+                  "BucketArn": "ARN of created S3 bucket"
+                }
+              }
+            }
+            
+            template.yaml:
+            AWSTemplateFormatVersion: '2010-09-09'
+            Parameters:
+              BucketPrefix:
+                Type: String
+            Resources:
+              SecureBucket:
+                Type: AWS::S3::Bucket
+                Properties:
+                  BucketName: !Sub '${BucketPrefix}-secure-${AWS::AccountId}'
+                  BucketEncryption:
+                    ServerSideEncryptionConfiguration:
+                      - ServerSideEncryptionByDefault:
+                          SSEAlgorithm: AES256
+                  VersioningConfiguration:
+                    Status: Enabled
+            Outputs:
+              BucketName:
+                Value: !Ref SecureBucket
+                Export:
+                  Name: !Sub '${AWS::StackName}-BucketName'
+              BucketArn:
+                Value: !GetAtt SecureBucket.Arn
+                Export:
+                  Name: !Sub '${AWS::StackName}-BucketArn'
+            
+            mutation-rules.yaml:
+            immutable:
+              - SecureBucket.BucketEncryption
+              - SecureBucket.VersioningConfiguration
+            append_only:
+              - SecureBucket.LifecycleConfiguration.Rules
+            required:
+              - SecureBucket
+          ```
+          
+          Composition workflow:
+          1. Consumer identifies bundle via substrate search
+          2. Consumer reviews mutation-rules.yaml for composition constraints
+          3. Consumer integrates template into seed/architecture
+          4. Mutation rules enforce composition safety during updates
+    implementation_identifiers:
+      module_path: schemas/cloudformation-bundle.schema.json
+    implementation_requirements:
+      error_handling:
+        strategy: Schema validation errors
+      observability:
+        logging:
+          level: info
+          structured: false
+        metrics:
+          - name: bundle_validations_total
+            type: counter
+      testing_requirements:
+        unit_test_coverage: '>= 80%'
+technology_stack:
+  - category: infrastructure
+    name: AWS CloudFormation
+    version: N/A
+    rationale: Primary IaC technology
+deployment_model:
+  storage: building-blocks/ directory
+system_boundaries:
+  - id: COMPBOUND-0003
+    name: CloudFormation Bundle Boundary
+    description: Reusable CloudFormation components
+    external_dependencies:
+      - AWS CloudFormation schema
+implementation_decisions:
+  - id: IMPL-0005
+    summary: Single template per bundle for focused scope
+    rationale: |
+      Enforces single-responsibility principle for building blocks. Complex capabilities
+      spanning multiple templates should be modeled as seeds instead.
+  - id: IMPL-0006
+    summary: Mandatory mutation rules
+    rationale: |
+      Bundles are explicitly designed for composition. Mutation rules communicate integration
+      constraints and prevent unsafe modifications by downstream consumers.
+constraints:
+  - id: CONST-0005
+    type: technical
+    description: Bundle template must be self-contained or declare required parameters
+    rationale: Enables composition validation and prevents runtime parameter errors
+  - id: CONST-0006
+    type: technical
+    description: Mutation rules must use CloudFormation logical IDs per ADR-PC-0005
+    rationale: Ensures rules are verifiable against template structure
+non_goals:
+  - Does not deploy stacks
+  - Does not enforce mutation rules at composition time (consumer responsibility)
+  - Does not provide cross-bundle dependency management

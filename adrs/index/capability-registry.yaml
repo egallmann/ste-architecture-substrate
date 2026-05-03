@@ -1,3 +1,611 @@
 schema_version: '1.1'
 type: normalized_entity_registry
-entities: []
+entities:
+- id: CAP-0001
+  entity_type: capability
+  name: Artifact Storage
+  summary: Store architecture seeds, building block bundles, and primitive blocks
+    with associated metadata
+  canonical_source:
+    source_type: logical_adr
+    source_ref: ADR-L-0001#CAP-0001
+    artifact_path: adrs/logical/ADR-L-0001-architecture-substrate-repository-scope.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-L-0001
+    domains:
+    - architecture
+    - infrastructure-as-code
+    - governance
+    implemented_by_components: []
+    enabled_by_decisions: []
+  relationships:
+    declared_in:
+    - ADR-L-0001
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in: []
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: logical_adr
+    source_ref: ADR-L-0001#CAP-0001
+    extraction_phase: extract_capability
+    classification: explicit
+    generator: adr-architecture-index
+- id: CAP-0002
+  entity_type: capability
+  name: Artifact Structuring
+  summary: Define and maintain schemas for artifact types and discovery surfaces
+  canonical_source:
+    source_type: logical_adr
+    source_ref: ADR-L-0001#CAP-0002
+    artifact_path: adrs/logical/ADR-L-0001-architecture-substrate-repository-scope.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-L-0001
+    domains:
+    - architecture
+    - infrastructure-as-code
+    - governance
+    implemented_by_components: []
+    enabled_by_decisions: []
+  relationships:
+    declared_in:
+    - ADR-L-0001
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in: []
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: logical_adr
+    source_ref: ADR-L-0001#CAP-0002
+    extraction_phase: extract_capability
+    classification: explicit
+    generator: adr-architecture-index
+- id: CAP-0003
+  entity_type: capability
+  name: Mutation Rule Definition
+  summary: Encode machine-readable constraints on artifact evolution (immutable, mutable,
+    conditional)
+  canonical_source:
+    source_type: logical_adr
+    source_ref: ADR-L-0001#CAP-0003
+    artifact_path: adrs/logical/ADR-L-0001-architecture-substrate-repository-scope.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-L-0001
+    domains:
+    - architecture
+    - infrastructure-as-code
+    - governance
+    implemented_by_components: []
+    enabled_by_decisions: []
+  relationships:
+    declared_in:
+    - ADR-L-0001
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in: []
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: logical_adr
+    source_ref: ADR-L-0001#CAP-0003
+    extraction_phase: extract_capability
+    classification: explicit
+    generator: adr-architecture-index
+- id: CAP-0004
+  entity_type: capability
+  name: Schema Definition
+  summary: Define JSON Schema contracts for substrate artifact types
+  canonical_source:
+    source_type: logical_adr
+    source_ref: ADR-L-0002#CAP-0004
+    artifact_path: adrs/logical/ADR-L-0002-artifact-authority-and-schema-ownership.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-L-0002
+    domains:
+    - architecture
+    - governance
+    - schema-management
+    implemented_by_components: []
+    enabled_by_decisions: []
+  relationships:
+    declared_in:
+    - ADR-L-0002
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in: []
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: logical_adr
+    source_ref: ADR-L-0002#CAP-0004
+    extraction_phase: extract_capability
+    classification: explicit
+    generator: adr-architecture-index
+- id: CAP-0005
+  entity_type: capability
+  name: Schema Validation
+  summary: Validate substrate artifacts against defined schemas using external validators
+  canonical_source:
+    source_type: logical_adr
+    source_ref: ADR-L-0002#CAP-0005
+    artifact_path: adrs/logical/ADR-L-0002-artifact-authority-and-schema-ownership.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-L-0002
+    domains:
+    - architecture
+    - governance
+    - schema-management
+    implemented_by_components: []
+    enabled_by_decisions: []
+  relationships:
+    declared_in:
+    - ADR-L-0002
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in: []
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: logical_adr
+    source_ref: ADR-L-0002#CAP-0005
+    extraction_phase: extract_capability
+    classification: explicit
+    generator: adr-architecture-index
+- id: CAP-0006
+  entity_type: capability
+  name: Schema Evolution
+  summary: Version and migrate schemas with documented breaking changes
+  canonical_source:
+    source_type: logical_adr
+    source_ref: ADR-L-0002#CAP-0006
+    artifact_path: adrs/logical/ADR-L-0002-artifact-authority-and-schema-ownership.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-L-0002
+    domains:
+    - architecture
+    - governance
+    - schema-management
+    implemented_by_components: []
+    enabled_by_decisions: []
+  relationships:
+    declared_in:
+    - ADR-L-0002
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in: []
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: logical_adr
+    source_ref: ADR-L-0002#CAP-0006
+    extraction_phase: extract_capability
+    classification: explicit
+    generator: adr-architecture-index
+- id: CAP-0007
+  entity_type: capability
+  name: Mutation Rule Definition
+  summary: Define technology-specific mutation rules for IaC artifacts
+  canonical_source:
+    source_type: logical_adr
+    source_ref: ADR-L-0003#CAP-0007
+    artifact_path: adrs/logical/ADR-L-0003-mutation-rules-model.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-L-0003
+    domains:
+    - architecture
+    - governance
+    - infrastructure-as-code
+    implemented_by_components: []
+    enabled_by_decisions: []
+  relationships:
+    declared_in:
+    - ADR-L-0003
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in: []
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: logical_adr
+    source_ref: ADR-L-0003#CAP-0007
+    extraction_phase: extract_capability
+    classification: explicit
+    generator: adr-architecture-index
+- id: CAP-0008
+  entity_type: capability
+  name: Constraint Categorization
+  summary: Categorize constraints as immutable, mutable, or conditional
+  canonical_source:
+    source_type: logical_adr
+    source_ref: ADR-L-0003#CAP-0008
+    artifact_path: adrs/logical/ADR-L-0003-mutation-rules-model.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-L-0003
+    domains:
+    - architecture
+    - governance
+    - infrastructure-as-code
+    implemented_by_components: []
+    enabled_by_decisions: []
+  relationships:
+    declared_in:
+    - ADR-L-0003
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in: []
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: logical_adr
+    source_ref: ADR-L-0003#CAP-0008
+    extraction_phase: extract_capability
+    classification: explicit
+    generator: adr-architecture-index
+- id: CAP-0009
+  entity_type: capability
+  name: AI Guidance
+  summary: Provide machine-readable constraints that guide AI decision-making by default
+  canonical_source:
+    source_type: logical_adr
+    source_ref: ADR-L-0003#CAP-0009
+    artifact_path: adrs/logical/ADR-L-0003-mutation-rules-model.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-L-0003
+    domains:
+    - architecture
+    - governance
+    - infrastructure-as-code
+    implemented_by_components: []
+    enabled_by_decisions: []
+  relationships:
+    declared_in:
+    - ADR-L-0003
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in: []
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: logical_adr
+    source_ref: ADR-L-0003#CAP-0009
+    extraction_phase: extract_capability
+    classification: explicit
+    generator: adr-architecture-index
+- id: CAP-0010
+  entity_type: capability
+  name: File-Based Discovery
+  summary: Provide substrate-index.yaml and substrate-manifest.yaml for artifact discovery
+  canonical_source:
+    source_type: logical_adr
+    source_ref: ADR-L-0004#CAP-0010
+    artifact_path: adrs/logical/ADR-L-0004-substrate-consumption-and-discovery.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-L-0004
+    domains:
+    - architecture
+    - integration
+    - discovery
+    implemented_by_components: []
+    enabled_by_decisions: []
+  relationships:
+    declared_in:
+    - ADR-L-0004
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in: []
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: logical_adr
+    source_ref: ADR-L-0004#CAP-0010
+    extraction_phase: extract_capability
+    classification: explicit
+    generator: adr-architecture-index
+- id: CAP-0011
+  entity_type: capability
+  name: Conventional Paths
+  summary: Organize artifacts in predictable directory structure (seeds/, building-blocks/,
+    primitives/)
+  canonical_source:
+    source_type: logical_adr
+    source_ref: ADR-L-0004#CAP-0011
+    artifact_path: adrs/logical/ADR-L-0004-substrate-consumption-and-discovery.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-L-0004
+    domains:
+    - architecture
+    - integration
+    - discovery
+    implemented_by_components: []
+    enabled_by_decisions: []
+  relationships:
+    declared_in:
+    - ADR-L-0004
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in: []
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: logical_adr
+    source_ref: ADR-L-0004#CAP-0011
+    extraction_phase: extract_capability
+    classification: explicit
+    generator: adr-architecture-index
+- id: CAP-0012
+  entity_type: capability
+  name: Technology Filtering
+  summary: Enable consumers to filter artifacts by IaC technology via metadata
+  canonical_source:
+    source_type: logical_adr
+    source_ref: ADR-L-0004#CAP-0012
+    artifact_path: adrs/logical/ADR-L-0004-substrate-consumption-and-discovery.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-L-0004
+    domains:
+    - architecture
+    - integration
+    - discovery
+    implemented_by_components: []
+    enabled_by_decisions: []
+  relationships:
+    declared_in:
+    - ADR-L-0004
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in: []
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: logical_adr
+    source_ref: ADR-L-0004#CAP-0012
+    extraction_phase: extract_capability
+    classification: explicit
+    generator: adr-architecture-index
+- id: CAP-0013
+  entity_type: capability
+  name: Corpus Sync
+  summary: Regenerate the complete discovery surface (substrate-index.json, substrate-manifest.yaml,
+    discovery/registries/*.json) by walking corpus/ and reading all metadata.json
+    files.
+  canonical_source:
+    source_type: logical_adr
+    source_ref: ADR-L-0005#CAP-0013
+    artifact_path: adrs/logical/ADR-L-0005-corpus-maintenance-and-discovery-sync.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-L-0005
+    domains:
+    - architecture
+    - tooling
+    - governance
+    implemented_by_components: []
+    enabled_by_decisions: []
+  relationships:
+    declared_in:
+    - ADR-L-0005
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in: []
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: logical_adr
+    source_ref: ADR-L-0005#CAP-0013
+    extraction_phase: extract_capability
+    classification: explicit
+    generator: adr-architecture-index
+- id: CAP-0014
+  entity_type: capability
+  name: Corpus Validate
+  summary: Validate all corpus metadata.json files against their respective JSON Schemas
+    (seed.schema.json, building-block-bundle.schema.json, primitive-block.schema.json)
+    and report violations with file path and field context.
+  canonical_source:
+    source_type: logical_adr
+    source_ref: ADR-L-0005#CAP-0014
+    artifact_path: adrs/logical/ADR-L-0005-corpus-maintenance-and-discovery-sync.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-L-0005
+    domains:
+    - architecture
+    - tooling
+    - governance
+    implemented_by_components: []
+    enabled_by_decisions: []
+  relationships:
+    declared_in:
+    - ADR-L-0005
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in: []
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: logical_adr
+    source_ref: ADR-L-0005#CAP-0014
+    extraction_phase: extract_capability
+    classification: explicit
+    generator: adr-architecture-index
+- id: CAP-0015
+  entity_type: capability
+  name: Corpus Contract Guard
+  summary: Verify bidirectional integrity between corpus/ filesystem and discovery/substrate-index.json.
+    Exit non-zero on drift. Used as pre-push hook and CI gate.
+  canonical_source:
+    source_type: logical_adr
+    source_ref: ADR-L-0005#CAP-0015
+    artifact_path: adrs/logical/ADR-L-0005-corpus-maintenance-and-discovery-sync.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-L-0005
+    domains:
+    - architecture
+    - tooling
+    - governance
+    implemented_by_components: []
+    enabled_by_decisions: []
+  relationships:
+    declared_in:
+    - ADR-L-0005
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in: []
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: logical_adr
+    source_ref: ADR-L-0005#CAP-0015
+    extraction_phase: extract_capability
+    classification: explicit
+    generator: adr-architecture-index

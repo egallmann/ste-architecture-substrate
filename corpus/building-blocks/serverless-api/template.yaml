@@ -1,0 +1,254 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Serverless REST API: API Gateway with Cognito authorizer, Lambda proxy handlers,
+  and DynamoDB access. JWT handler for Cognito token exchange.
+  Building block extracted from the reference-webapp substrate pattern.
+
+Parameters:
+  AppName:
+    Type: String
+    AllowedPattern: ^[a-z0-9-]{3,40}$
+
+  Env:
+    Type: String
+    AllowedValues: [dev, staging, prod]
+    Default: dev
+
+  LambdaCodeS3Bucket:
+    Type: String
+
+  LambdaCodeS3Key:
+    Type: String
+    Description: S3 key for the API handler Lambda package
+
+  JwtLambdaCodeS3Key:
+    Type: String
+    Description: S3 key for the JWT handler Lambda package
+
+  CognitoUserPoolArn:
+    Type: String
+    Description: ARN of the Cognito User Pool for the REST API authorizer
+
+  CognitoUserPoolId:
+    Type: String
+
+  CognitoAppClientId:
+    Type: String
+
+  CognitoDomainPrefix:
+    Type: String
+
+  DistributionDomain:
+    Type: String
+    Description: CloudFront domain name used as Cognito redirect URI
+
+  DynamoTableName:
+    Type: String
+    Description: DynamoDB table name the API handler reads/writes
+
+Resources:
+
+  ApiHandlerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  ApiHandlerPolicy:
+    Type: AWS::IAM::RolePolicy
+    Properties:
+      RoleName: !Ref ApiHandlerRole
+      PolicyName: dynamo-access
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - dynamodb:BatchGetItem
+              - dynamodb:GetItem
+              - dynamodb:Query
+              - dynamodb:Scan
+              - dynamodb:BatchWriteItem
+              - dynamodb:PutItem
+              - dynamodb:UpdateItem
+            Resource: !Sub arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${DynamoTableName}
+
+  ApiHandlerFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub ${AppName}-api-handler
+      Handler: bootstrap
+      Runtime: provided.al2023
+      Role: !GetAtt ApiHandlerRole.Arn
+      Code:
+        S3Bucket: !Ref LambdaCodeS3Bucket
+        S3Key: !Ref LambdaCodeS3Key
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref DynamoTableName
+
+  JwtHandlerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  JwtHandlerFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub ${AppName}-jwt-handler
+      Handler: bootstrap
+      Runtime: provided.al2023
+      Role: !GetAtt JwtHandlerRole.Arn
+      Code:
+        S3Bucket: !Ref LambdaCodeS3Bucket
+        S3Key: !Ref JwtLambdaCodeS3Key
+      Environment:
+        Variables:
+          COGNITO_REGION: !Ref AWS::Region
+          COGNITO_POOL_ID: !Ref CognitoUserPoolId
+          COGNITO_APP_CLIENT_ID: !Ref CognitoAppClientId
+          COGNITO_DOMAIN_PREFIX: !Ref CognitoDomainPrefix
+          COGNITO_REDIRECT_URI: !Sub https://${DistributionDomain}/index.html
+
+  RestApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: !Sub ${AppName}-api
+
+  RestApiAuthorizer:
+    Type: AWS::ApiGateway::Authorizer
+    Properties:
+      Name: CognitoAuthorizer
+      RestApiId: !Ref RestApi
+      Type: COGNITO_USER_POOLS
+      IdentitySource: method.request.header.authorization
+      ProviderARNs:
+        - !Ref CognitoUserPoolArn
+
+  ApiResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref RestApi
+      ParentId: !GetAtt RestApi.RootResourceId
+      PathPart: api
+
+  JwtResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref RestApi
+      ParentId: !GetAtt RestApi.RootResourceId
+      PathPart: jwt
+
+  ApiGetMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref RestApi
+      ResourceId: !Ref ApiResource
+      HttpMethod: GET
+      AuthorizationType: COGNITO_USER_POOLS
+      AuthorizerId: !Ref RestApiAuthorizer
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ApiHandlerFunction.Arn}/invocations
+
+  ApiOptionsMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref RestApi
+      ResourceId: !Ref ApiResource
+      HttpMethod: OPTIONS
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ApiHandlerFunction.Arn}/invocations
+
+  JwtGetMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref RestApi
+      ResourceId: !Ref JwtResource
+      HttpMethod: GET
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${JwtHandlerFunction.Arn}/invocations
+
+  JwtOptionsMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref RestApi
+      ResourceId: !Ref JwtResource
+      HttpMethod: OPTIONS
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${JwtHandlerFunction.Arn}/invocations
+
+  ApiHandlerPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt ApiHandlerFunction.Arn
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${RestApi}/*/*/*
+
+  JwtHandlerPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt JwtHandlerFunction.Arn
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${RestApi}/*/*/*
+
+  RestApiDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn: [ApiGetMethod, ApiOptionsMethod, JwtGetMethod, JwtOptionsMethod]
+    Properties:
+      RestApiId: !Ref RestApi
+
+  RestApiStage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      RestApiId: !Ref RestApi
+      DeploymentId: !Ref RestApiDeployment
+      StageName: !Ref Env
+
+Outputs:
+  RestApiId:
+    Value: !Ref RestApi
+    Export:
+      Name: !Sub ${AWS::StackName}-RestApiId
+
+  RestApiUrl:
+    Value: !Sub https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/${RestApiStage}
+    Export:
+      Name: !Sub ${AWS::StackName}-RestApiUrl
+
+  ApiHandlerFunctionArn:
+    Value: !GetAtt ApiHandlerFunction.Arn
+    Export:
+      Name: !Sub ${AWS::StackName}-ApiHandlerArn
+
+  JwtHandlerFunctionArn:
+    Value: !GetAtt JwtHandlerFunction.Arn
+    Export:
+      Name: !Sub ${AWS::StackName}-JwtHandlerArn

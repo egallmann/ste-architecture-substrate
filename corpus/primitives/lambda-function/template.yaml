@@ -1,0 +1,36 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Minimal Lambda function — no VPC, no layers.
+
+Parameters:
+  FunctionName:
+    Type: String
+  Handler:
+    Type: String
+    Default: bootstrap
+  Runtime:
+    Type: String
+    Default: provided.al2023
+  CodeS3Bucket:
+    Type: String
+  CodeS3Key:
+    Type: String
+  ExecutionRoleArn:
+    Type: String
+
+Resources:
+  Function:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Ref FunctionName
+      Handler: !Ref Handler
+      Runtime: !Ref Runtime
+      Role: !Ref ExecutionRoleArn
+      Code:
+        S3Bucket: !Ref CodeS3Bucket
+        S3Key: !Ref CodeS3Key
+
+Outputs:
+  FunctionArn:
+    Value: !GetAtt Function.Arn
+  FunctionName:
+    Value: !Ref Function

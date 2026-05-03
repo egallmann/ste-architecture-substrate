@@ -1,0 +1,200 @@
+schema_version: '1.0'
+adr_type: physical-component
+id: ADR-PC-0009
+title: Corpus Maintenance CLI Tooling
+status: proposed
+created_date: '2026-05-02'
+authors:
+- Erik Gallmann
+implements_logical:
+- ADR-L-0005
+implements_system:
+- ADR-PS-0001
+domains:
+- tooling
+- governance
+context: |
+  ADR-L-0005 defines the corpus maintenance capability (sync, validate, check).
+  ADR-PC-0001 defines the substrate CLI for artifact retrieval and search.
+  This component implements the maintenance side: keeping the discovery surface
+  consistent with the corpus as the corpus evolves.
+
+  The implementation is a standalone Python script (tools/corpus_cli.py) executable
+  without package installation, satisfying the ADR-L-0005 decision for zero-ceremony
+  fork usage. It also serves as the contract guard command required by AGENTS.md.
+
+component_specifications:
+  - id: COMP-0009
+    name: corpus_cli
+    type: service
+    responsibilities: |
+      - Walk corpus/ tree and build artifact inventory from metadata.json files
+      - Validate metadata files against JSON Schemas (seed, bundle, primitive)
+      - Regenerate discovery surface (substrate-index.json, substrate-manifest.yaml, registries)
+      - Verify bidirectional integrity (index ↔ filesystem) and exit non-zero on drift
+      - Provide human-readable listing of registered artifacts
+    generation_context:
+      purpose: Corpus maintenance and discovery sync CLI
+      key_responsibilities:
+        - Walk corpus/ and read metadata.json files
+        - Generate discovery/substrate-index.json, substrate-manifest.yaml, registries
+        - Contract guard — exit non-zero on corpus/discovery drift
+      constraints:
+        - Must not write to corpus/
+        - Must not require network access
+        - Output must be deterministic
+    interfaces:
+      - id: IFACE-0009
+        type: CLI
+        specification: |
+          Entry point: tools/corpus_cli.py
+
+          Commands:
+
+          1. python tools/corpus_cli.py sync
+             Walk corpus/, read all metadata.json files, regenerate all discovery files.
+             Writes: discovery/substrate-index.json
+                     discovery/substrate-manifest.yaml
+                     discovery/registries/seeds.json
+                     discovery/registries/bundles.json
+                     discovery/registries/primitives.json
+                     discovery/registries/technologies.json
+             Exit 0 on success. Exit 1 if any metadata.json fails to parse.
+
+          2. python tools/corpus_cli.py validate
+             Validate all corpus/*/metadata.json files against their JSON Schemas.
+             Reports: file path, field path, and validation error for each failure.
+             Exit 0 if all pass. Exit 1 if any validation error.
+
+          3. python tools/corpus_cli.py check
+             Contract guard. Verify:
+             (a) every entry in discovery/substrate-index.json resolves to a real
+                 file on disk (no orphan index entries)
+             (b) every corpus artifact on disk appears in the index (no unregistered
+                 artifacts)
+             (c) all referenced files (template, mutation_rules) exist
+             Exit 0 if consistent. Exit 1 on any drift with actionable message.
+
+          4. python tools/corpus_cli.py list [--type seed|bundle|primitive] [--json]
+             List all registered artifacts from the discovery index.
+             Default: human-readable table. --json: JSON array output.
+             Options:
+               --type    Filter by artifact type
+               --json    Emit JSON (machine-readable)
+
+          Aliases / convenience:
+            python tools/corpus_cli.py sync && python tools/corpus_cli.py check
+            (recommended post-authoring workflow)
+
+    implementation_identifiers:
+      module_path: tools/corpus_cli.py
+      entry_point: tools/corpus_cli.py
+      test_path: tests/test_corpus_cli.py
+
+    implementation_requirements:
+      error_handling:
+        strategy: |
+          Exit non-zero with clear actionable messages. Never raise unhandled
+          exceptions to the user. Validate inputs before writing any output files.
+      observability:
+        logging:
+          level: info
+          structured: false
+        metrics:
+          - name: corpus_cli_commands_total
+            type: counter
+            description: Count of corpus CLI command invocations by command name
+      testing_requirements:
+        unit_test_coverage: '>= 80%'
+        contract_guard_test: |
+          tests/test_corpus_cli.py must include an idempotency test:
+          run sync twice and assert that both discovery outputs are byte-identical.
+          Must also include a drift detection test:
+          add a metadata.json outside the index, run check, assert exit 1.
+
+technology_stack:
+  - category: language
+    name: Python
+    version: '3.10+'
+    rationale: Consistent with adr-architecture-kit and STE ecosystem tooling
+  - category: library
+    name: jsonschema
+    version: '4.x'
+    rationale: Schema validation for metadata.json files (already used in tests)
+  - category: library
+    name: PyYAML
+    version: '6.x'
+    rationale: YAML read/write for substrate-manifest.yaml and mutation-rules.yaml
+
+deployment_model:
+  installation: |
+    No installation required. Run directly:
+      python tools/corpus_cli.py <command>
+    Pre-push hook: .git/hooks/pre-push calls corpus check.
+    CI: runs corpus check as a lint step.
+
+system_boundaries:
+  - id: COMPBOUND-0009
+    name: corpus_cli Boundary
+    description: Reads corpus/, writes discovery/. No network. No corpus mutation.
+    external_dependencies:
+      - File system (corpus/ read, discovery/ write)
+      - JSON Schema files in schemas/
+      - Python 3.10+ standard library + jsonschema + PyYAML
+
+implementation_decisions:
+  - id: IMPL-0014
+    summary: Single-file standalone script (tools/corpus_cli.py)
+    rationale: |
+      Zero-installation requirement (ADR-L-0005 DEC-0028). A single file is trivially
+      portable — fork and run. No build step, no virtualenv assumption beyond the
+      standard Python environment already used for adr-kit and schema tests.
+
+  - id: IMPL-0015
+    summary: |
+      Corpus traversal uses directory naming convention to infer artifact type:
+      corpus/seeds/* → seed, corpus/building-blocks/* → building_block,
+      corpus/primitives/* → primitive.
+    rationale: |
+      Convention over configuration. No extra type discriminator required in metadata.json
+      — the path encodes the type. This matches the discoverable directory structure
+      defined in ADR-L-0004 and reinforced by the corpus/ restructure.
+
+  - id: IMPL-0016
+    summary: Sync writes all discovery files atomically (write to temp, rename)
+    rationale: |
+      Prevents partial discovery state if the script is interrupted mid-write.
+      Ensures consumers always see either the old complete state or the new
+      complete state, never a mixed partial state.
+
+  - id: IMPL-0017
+    summary: |
+      check is the designated repo contract guard command per AGENTS.md requirements.
+      Pre-push hook script: tools/install-hooks.sh.
+    rationale: |
+      AGENTS.md requires a repo-local contract guard for generated artifacts.
+      A companion install script (tools/install-hooks.sh) makes hook setup
+      explicit and reproducible for fork contributors.
+
+constraints:
+  - id: CONST-0009-A
+    type: technical
+    description: corpus_cli MUST NOT write to corpus/ under any command
+    rationale: Corpus artifact authority (ADR-L-0002, ADR-L-0005 DEC-0029)
+
+  - id: CONST-0009-B
+    type: technical
+    description: All schema validation must use schemas/ as the source of truth
+    rationale: Schema authority is defined in ADR-L-0002; tooling must not embed schema copies
+
+  - id: CONST-0009-C
+    type: technical
+    description: corpus sync output must be deterministic (sorted keys, sorted entries)
+    rationale: Deterministic output enables reliable git diff and idempotency tests (INV-0016)
+
+non_goals:
+  - Does not deploy IaC templates
+  - Does not author or scaffold new corpus artifacts (separate concern)
+  - Does not modify ADRs
+  - Does not perform git operations (commit, tag, push)
+  - Does not serve the discovery surface over HTTP

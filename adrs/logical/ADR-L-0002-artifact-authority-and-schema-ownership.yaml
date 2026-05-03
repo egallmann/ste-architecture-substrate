@@ -1,0 +1,213 @@
+schema_version: '1.0'
+adr_type: logical
+id: ADR-L-0002
+title: Artifact Authority and Schema Ownership
+status: proposed
+created_date: '2026-05-02'
+authors:
+- Erik Gallmann
+domains:
+- architecture
+- governance
+- schema-management
+
+context: |
+  The STE ecosystem has established patterns for schema authority across repositories.
+  ste-spec owns normative cross-repo Architecture IR contracts, adr-architecture-kit
+  owns ADR authoring schemas, and ste-runtime owns workspace extraction schemas.
+  
+  ste-architecture-substrate introduces new artifact types (seeds, building blocks,
+  primitives, mutation rules) and must define clear schema ownership boundaries
+  that align with existing STE patterns.
+  
+  This ADR defines what ste-architecture-substrate owns, what external systems own,
+  and how schema evolution and cross-repo coordination occurs.
+
+decisions:
+- id: DEC-0008
+  summary: |
+    ste-architecture-substrate owns artifact structure schemas (seed, building block,
+    primitive, mutation rules) and discovery surface schemas (substrate-index, substrate-manifest).
+  rationale: |
+    These schemas define the internal structure of substrate artifacts and how they
+    are discovered. Substrate is the authority for its own artifact model. Ownership
+    enables substrate to evolve artifact schemas independently while maintaining
+    stable external interfaces.
+
+- id: DEC-0009
+  summary: |
+    ste-spec owns normative cross-repo Architecture IR contracts if substrate artifacts
+    appear in Architecture IR.
+  rationale: |
+    Follows STE pattern: ste-spec is the single normative source for cross-repo
+    interchange contracts. If substrate artifacts are represented in Architecture
+    IR (e.g., for kernel admission or governance), the IR schema lives in ste-spec,
+    not substrate. Substrate may mirror schemas for validation (with contract guards).
+
+- id: DEC-0010
+  summary: adr-architecture-kit owns ADR authoring schemas (ADR-L, ADR-PS, ADR-PC).
+  rationale: |
+    Follows STE pattern: adr-kit defines stable authoring contracts for ADR YAML.
+    Substrate artifacts contain ADR bundles but do not redefine ADR schemas. This
+    maintains clear separation between artifact storage (substrate) and ADR authoring
+    (adr-kit).
+
+- id: DEC-0011
+  summary: |
+    Schema evolution follows semantic versioning with explicit migration paths for
+    breaking changes.
+  rationale: |
+    Substrate artifacts are long-lived and may be consumed by multiple systems across
+    versions. Semantic versioning (schema_version field) enables consuming systems
+    to detect compatibility. Breaking changes require migration documentation and
+    tooling support.
+
+- id: DEC-0012
+  summary: |
+    Contract guard and fixture sync patterns follow STE workspace conventions: test
+    fixtures for sibling schema synchronization, optional CI parity checks, mirror
+    provenance documentation.
+  rationale: |
+    When substrate mirrors external schemas (e.g., Architecture IR from ste-spec),
+    contract guards detect drift. Follows adr-architecture-kit pattern: byte-compare
+    tests when sibling checkout exists, advisory CI checks, MIRROR.md provenance.
+    Prevents silent schema divergence between repos.
+
+capabilities:
+- id: CAP-0004
+  name: Schema Definition
+  description: Define JSON Schema contracts for substrate artifact types
+  
+- id: CAP-0005
+  name: Schema Validation
+  description: Validate substrate artifacts against defined schemas using external validators
+  
+- id: CAP-0006
+  name: Schema Evolution
+  description: Version and migrate schemas with documented breaking changes
+
+architectural_boundaries:
+- id: BOUND-0001
+  name: ste-architecture-substrate Ownership
+  description: |
+    Artifact structure schemas (seed, bundle, primitive, mutation rules), discovery
+    schemas (substrate-index, substrate-manifest)
+  rationale: |
+    Substrate owns its internal artifact model to enable independent evolution while
+    maintaining stable external interfaces
+
+- id: BOUND-0002
+  name: ste-spec Ownership
+  description: |
+    Normative Architecture IR contracts (if substrate artifacts appear in IR)
+  rationale: |
+    Follows STE pattern where ste-spec owns all cross-repo interchange contracts
+
+- id: BOUND-0003
+  name: adr-architecture-kit Ownership
+  description: |
+    ADR authoring schemas (ADR-L, ADR-PS, ADR-PC)
+  rationale: |
+    Follows STE pattern where adr-kit owns ADR authoring contracts; substrate uses
+    but does not redefine
+
+- id: BOUND-0004
+  name: IaC Technology Ownership
+  description: |
+    Individual IaC technologies own structural validity rules (CloudFormation schema,
+    Terraform syntax, CDK type system)
+  rationale: |
+    Technology providers (AWS, HashiCorp, etc.) are authorities for their own IaC
+    syntax and semantics
+
+interaction_contracts:
+- id: CONTRACT-0001
+  description: |
+    Schema publication: schemas live under schemas/ directory, versioned, referenced
+    by $schema field in artifacts
+  parties:
+    - ste-architecture-substrate
+    - consuming systems
+  protocol: JSON Schema files with $id and $schema references
+  guarantees: |
+    Schemas are valid JSON Schema (Draft 2020-12 or later). Schema $id fields
+    are stable URIs. Artifacts reference schemas via $schema field.
+
+- id: CONTRACT-0002
+  description: |
+    Schema mirroring: if substrate mirrors external schemas, use contract guards
+    (fixture sync tests, CI parity checks, MIRROR.md provenance)
+  parties:
+    - ste-architecture-substrate
+    - ste-spec
+  protocol: Byte-compare tests with sibling checkout, advisory CI checks
+  guarantees: |
+    Mirrored schemas are byte-identical to source. Contract guards detect drift
+    within one commit. MIRROR.md documents sync provenance.
+
+- id: CONTRACT-0003
+  description: |
+    Schema evolution: breaking changes increment schema_version, require migration
+    documentation, may require tooling support
+  parties:
+    - ste-architecture-substrate
+    - consuming systems
+  protocol: Semantic versioning with documented migration paths
+  guarantees: |
+    Breaking changes increment major version. Migration guides provided for breaking
+    changes. Deprecated fields marked with deprecation notices.
+
+constraints:
+- id: CONST-0001
+  description: Substrate must not redefine ADR authoring schemas (adr-kit authority)
+  type: technical
+  rationale: adr-architecture-kit owns ADR authoring contracts
+  
+- id: CONST-0002
+  description: Substrate must not redefine Architecture IR schemas (ste-spec authority)
+  type: technical
+  rationale: ste-spec owns normative cross-repo Architecture IR contracts
+  
+- id: CONST-0003
+  description: Substrate must not redefine IaC technology schemas (technology authority)
+  type: technical
+  rationale: Technology providers own their own IaC syntax and semantics
+
+invariants:
+- id: INV-0005
+  statement: |
+    Schema ownership boundaries are explicit and documented in schema files ($id, description)
+  scope: global
+  enforcement_level: must
+  enforcement_mechanism: design
+  verification_method: manual
+  rationale: Prevents ambiguity about schema authority
+  compliance_frameworks: []
+  exceptions: []
+  
+- id: INV-0006
+  statement: |
+    Schema versions use semantic versioning (major.minor.patch) in schema_version field
+  scope: global
+  enforcement_level: must
+  enforcement_mechanism: design
+  verification_method: automated
+  rationale: Enables consuming systems to detect compatibility
+  compliance_frameworks: []
+  exceptions: []
+  
+- id: INV-0007
+  statement: |
+    Mirrored schemas have provenance documentation (MIRROR.md or schema comments)
+    and contract guards
+  scope: global
+  enforcement_level: must
+  enforcement_mechanism: policy
+  verification_method: automated
+  rationale: Prevents silent schema divergence between repos
+  compliance_frameworks: []
+  exceptions: []
+
+non_functional_requirements: []
+
+gaps: []

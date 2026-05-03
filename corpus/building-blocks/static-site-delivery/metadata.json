@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0.0",
+  "metadata": {
+    "id": "static-site-delivery",
+    "name": "Static Site Delivery",
+    "description": "CloudFront distribution with S3 origin, Origin Access Control, WAFv2 with AWS Managed Rules, versioned content bucket with replication, and access logging. Extracted from reference-webapp.",
+    "version": "1.0.0",
+    "technology": "cloudformation",
+    "domains": ["web", "cdn", "security"],
+    "tags": ["cloudfront", "s3", "waf", "oac", "static-hosting", "replication"]
+  },
+  "adr_bundle": ["ADR-L-0001", "ADR-PS-0002"],
+  "adr_context_prose": "adr-context.md",
+  "mutation_rules": "mutation-rules.yaml",
+  "dependencies": [],
+  "cloudformation": {
+    "template": "template.yaml",
+    "fragment_type": "resources",
+    "required_parameters": {
+      "AppName": {"type": "String", "description": "Name prefix for resources"},
+      "Env": {"type": "String", "description": "Environment name"}
+    },
+    "exports": {
+      "DistributionId": "CloudFront distribution ID",
+      "DistributionDomain": "CloudFront distribution domain name",
+      "ContentBucketName": "S3 static content bucket name",
+      "ContentBucketArn": "S3 static content bucket ARN",
+      "WebACLArn": "WAFv2 WebACL ARN"
+    }
+  }
+}

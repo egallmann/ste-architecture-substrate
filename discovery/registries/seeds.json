@@ -1,0 +1,20 @@
+{
+  "entries": [
+    {
+      "composition": [
+        "static-site-delivery",
+        "serverless-api",
+        "cognito-auth"
+      ],
+      "id": "reference-webapp",
+      "metadata_file": "corpus/seeds/reference-webapp/metadata.json",
+      "mutation_rules": "corpus/seeds/reference-webapp/mutation-rules.yaml",
+      "name": "Reference Web Application",
+      "technology": "cloudformation",
+      "template": "corpus/seeds/reference-webapp/webapp.yaml",
+      "version": "1.0.0"
+    }
+  ],
+  "registry": "seeds",
+  "schema_version": "1.0.0"
+}

@@ -1,0 +1,314 @@
+schema_version: '1.0'
+adr_type: physical-component
+id: ADR-PC-0008
+title: Substrate Discovery Bundle Generation
+status: proposed
+created_date: '2026-05-02'
+authors:
+- Erik Gallmann
+implements_logical:
+- ADR-L-0004
+implements_system:
+- ADR-PS-0001
+domains:
+- discovery
+context: |
+  Discovery bundle generation produces machine-readable artifacts that enable substrate
+  artifact discovery, retrieval, and integration by downstream tooling. The bundle includes
+  indices, manifests, and registries derived from canonical seed/bundle/primitive artifacts.
+  
+  Discovery artifacts are derived state, not canonical. They enable:
+  - Fast artifact search without filesystem traversal
+  - Technology-specific filtering (CloudFormation, Terraform, etc.)
+  - Dependency analysis and composition planning
+  - Integration with CI/CD pipelines and IaC tooling
+  
+  Generation is idempotent and reproducible from canonical artifacts.
+component_specifications:
+  - id: COMP-0008
+    name: Discovery Bundle Generator
+    type: service
+    responsibilities: |
+      - Generate substrate-index.json from artifacts
+      - Generate substrate-manifest.yaml
+      - Generate artifact registries
+    generation_context:
+      purpose: Generate discovery bundles from canonical artifacts
+      key_responsibilities:
+        - Discovery bundle generation
+        - Index and manifest creation
+        - Registry aggregation
+      constraints:
+        - Read-only operations on artifacts
+    interfaces:
+      - id: IFACE-0008
+        type: CLI
+        specification: |
+          substrate compile [options]
+          
+          Options:
+            --output <path>              Output directory (default: ./discovery/)
+            --include-schemas            Include JSON schemas in bundle
+            --format json|yaml           Output format for manifest
+            --validate                   Validate artifacts before compiling
+          
+          Outputs:
+          
+          1. substrate-index.json
+             Top-level index of all artifacts with metadata
+             
+          2. substrate-manifest.yaml
+             Human-readable manifest with ADR traceability
+             
+          3. registries/
+             - seeds.json         (All seed artifacts)
+             - bundles.json       (All building block bundles)
+             - primitives.json    (All primitive artifacts)
+             - technologies.json  (Technology-specific groupings)
+          
+          Discovery Bundle Structure:
+          ```
+          discovery/
+            substrate-index.json         # Main index
+            substrate-manifest.yaml      # Human-readable manifest
+            registries/
+              seeds.json
+              bundles.json
+              primitives.json
+              technologies.json
+            schemas/                     # Optional: JSON schemas
+              seed.schema.json
+              bundle.schema.json
+              primitive.schema.json
+          ```
+          
+          substrate-index.json structure:
+          ```json
+          {
+            "version": "1.0.0",
+            "generated_at": "2026-05-02T19:00:00Z",
+            "repository": {
+              "name": "ste-architecture-substrate",
+              "path": "/path/to/repo"
+            },
+            "statistics": {
+              "total_seeds": 5,
+              "total_bundles": 12,
+              "total_primitives": 8,
+              "technologies": ["cloudformation"]
+            },
+            "seeds": [
+              {
+                "id": "vpc-baseline",
+                "name": "VPC Baseline Architecture",
+                "technology": "cloudformation",
+                "version": "1.0.0",
+                "path": "seeds/vpc-baseline",
+                "adr_references": ["ADR-L-0001", "ADR-PS-0002"],
+                "templates_count": 2,
+                "parameters": ["Environment", "VpcCidr"],
+                "tags": ["networking", "vpc", "baseline"]
+              }
+            ],
+            "bundles": [
+              {
+                "id": "s3-secure-bucket",
+                "name": "Secure S3 Bucket",
+                "technology": "cloudformation",
+                "version": "1.0.0",
+                "path": "building-blocks/s3-secure-bucket",
+                "adr_references": ["ADR-L-0001"],
+                "has_mutation_rules": true,
+                "required_parameters": ["BucketPrefix"],
+                "exports": ["BucketName", "BucketArn"],
+                "tags": ["storage", "s3", "security"]
+              }
+            ],
+            "primitives": [
+              {
+                "id": "lambda-function",
+                "technology": "cloudformation",
+                "path": "primitives/lambda-function.yaml"
+              }
+            ]
+          }
+          ```
+          
+          substrate-manifest.yaml structure:
+          ```yaml
+          version: 1.0.0
+          generated_at: '2026-05-02T19:00:00Z'
+          repository:
+            name: ste-architecture-substrate
+            path: /path/to/repo
+          
+          seeds:
+            - id: vpc-baseline
+              name: VPC Baseline Architecture
+              description: Multi-AZ VPC with public/private subnets and VPC endpoints
+              technology: cloudformation
+              version: 1.0.0
+              path: seeds/vpc-baseline
+              adr_references:
+                - ADR-L-0001
+                - ADR-PS-0002
+              templates:
+                - vpc-main.yaml
+                - vpc-endpoints.yaml
+          
+          bundles:
+            - id: s3-secure-bucket
+              name: Secure S3 Bucket
+              description: S3 bucket with encryption, versioning, and lifecycle policies
+              technology: cloudformation
+              version: 1.0.0
+              path: building-blocks/s3-secure-bucket
+              mutation_rules: true
+          ```
+          
+          registries/seeds.json (technology-agnostic):
+          ```json
+          {
+            "seeds": [
+              {
+                "id": "vpc-baseline",
+                "technology": "cloudformation",
+                "metadata": { ... },
+                "path": "seeds/vpc-baseline"
+              }
+            ]
+          }
+          ```
+          
+          registries/technologies.json (grouped by tech):
+          ```json
+          {
+            "cloudformation": {
+              "seeds": ["vpc-baseline", "ecs-cluster-baseline"],
+              "bundles": ["s3-secure-bucket", "lambda-function-bundle"],
+              "primitives": ["lambda-function", "s3-bucket-simple"]
+            }
+          }
+          ```
+          
+          Generation Workflow:
+          
+          1. Scan Phase:
+          ```
+          - Traverse seeds/, building-blocks/, primitives/ directories
+          - Parse metadata.json from each artifact
+          - Extract ADR references, parameters, templates
+          - Validate artifact structure (optional)
+          ```
+          
+          2. Aggregation Phase:
+          ```
+          - Group artifacts by type (seed, bundle, primitive)
+          - Group artifacts by technology (cloudformation, terraform, etc.)
+          - Calculate statistics (counts, template counts, parameter counts)
+          - Build cross-references (ADR → artifacts)
+          ```
+          
+          3. Output Phase:
+          ```
+          - Generate substrate-index.json (machine-readable)
+          - Generate substrate-manifest.yaml (human-readable)
+          - Generate registries/ (grouped views)
+          - Copy schemas/ if --include-schemas
+          ```
+          
+          4. Validation Phase (optional):
+          ```
+          - Verify all referenced ADRs exist
+          - Validate JSON structure against schemas
+          - Check for duplicate artifact IDs
+          - Verify file paths exist
+          ```
+          
+          CLI Examples:
+          
+          Basic compilation:
+          ```bash
+          substrate compile
+          # Outputs to ./discovery/
+          ```
+          
+          Custom output directory:
+          ```bash
+          substrate compile --output ./dist/substrate-discovery/
+          ```
+          
+          Include schemas and validate:
+          ```bash
+          substrate compile --include-schemas --validate
+          ```
+          
+          CI/CD Integration:
+          ```bash
+          # Generate discovery bundle
+          substrate compile --output ./public/discovery/ --validate
+          
+          # Publish to static hosting (S3, GitHub Pages, etc.)
+          aws s3 sync ./public/discovery/ s3://substrate-discovery/
+          
+          # Downstream consumers fetch via HTTP
+          curl https://substrate-discovery.example.com/substrate-index.json
+          ```
+    implementation_identifiers:
+      module_path: src/cli/compile.py
+      entry_point: src/cli/compile.py
+      test_path: tests/cli/
+    implementation_requirements:
+      error_handling:
+        strategy: Fail on invalid artifacts; actionable error messages
+      observability:
+        logging:
+          level: info
+          structured: false
+        metrics:
+          - name: discovery_bundle_generations_total
+            type: counter
+      testing_requirements:
+        unit_test_coverage: '>= 80%'
+technology_stack:
+  - category: language
+    name: Python
+    version: 3.10+
+    rationale: Generator implementation
+deployment_model:
+  command: substrate compile
+system_boundaries:
+  - id: COMPBOUND-0008
+    name: Discovery Generator Boundary
+    description: Discovery bundle generation
+    external_dependencies:
+      - Canonical artifacts
+implementation_decisions:
+  - id: IMPL-0011
+    summary: Generate both machine-readable JSON and human-readable YAML
+    rationale: |
+      JSON index enables fast programmatic discovery; YAML manifest supports human review
+      and documentation generation. Dual format maximizes utility.
+  - id: IMPL-0012
+    summary: Derive discovery artifacts from canonical sources only
+    rationale: |
+      Ensures discovery bundle can be regenerated from source artifacts without state.
+      Prevents drift between canonical artifacts and discovery metadata.
+  - id: IMPL-0013
+    summary: Include ADR traceability in all discovery artifacts
+    rationale: |
+      Enables consumers to understand architecture decisions behind artifacts and navigate
+      from implementation (seed/bundle) back to logical decisions (ADR-L).
+constraints:
+  - id: CONST-0011
+    type: technical
+    description: Discovery generation must be idempotent and reproducible
+    rationale: Supports CI/CD automation and prevents non-deterministic output
+  - id: CONST-0012
+    type: technical
+    description: Discovery artifacts must not be committed to version control
+    rationale: They are derived state, should be generated during build/publish
+non_goals:
+  - Does not validate artifacts (validation is separate concern, see ADR-PC-0006)
+  - Does not publish discovery bundles (publishing is deployment concern)
+  - Does not provide artifact dependency resolution (consumer responsibility)

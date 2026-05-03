@@ -1,0 +1,27 @@
+{
+  "schema_version": "1.0.0",
+  "metadata": {
+    "id": "aws-cfn-templates-webapp-sample",
+    "name": "AWS Samples — Web application (S3, CloudFront, API GW, Cognito, DynamoDB)",
+    "description": "Reference fixture based on aws-cloudformation-templates Solutions/WebApp/webapp.yaml (Apache-2.0). For schema stress-testing only.",
+    "version": "1.0.0",
+    "technology": "cloudformation",
+    "domains": ["web", "serverless", "reference"],
+    "tags": ["aws-samples", "cloudformation", "fixture"]
+  },
+  "adr_bundle": [],
+  "mutation_rules": "mutation-rules.example.yaml",
+  "composition": [],
+  "cloudformation": {
+    "templates": [
+      {
+        "id": "webapp",
+        "path": "webapp.yaml",
+        "description": "Single-template reference web application stack",
+        "stack_name_pattern": "{env}-webapp-sample"
+      }
+    ],
+    "parameters": {},
+    "capabilities": ["CAPABILITY_IAM", "CAPABILITY_NAMED_IAM", "CAPABILITY_AUTO_EXPAND"]
+  }
+}

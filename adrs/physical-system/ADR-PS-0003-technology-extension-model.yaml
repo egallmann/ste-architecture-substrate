@@ -1,0 +1,146 @@
+schema_version: '1.0'
+adr_type: physical-system
+id: ADR-PS-0003
+title: Technology Extension Model
+status: proposed
+created_date: '2026-05-02'
+authors:
+- Erik Gallmann
+implements_logical:
+- ADR-L-0001
+- ADR-L-0004
+domains:
+- architecture
+- schema-design
+
+context: |
+  ADR-PS-0002 defines the core artifact interface with technology-agnostic fields.
+  Different IaC technologies need technology-specific fields (CloudFormation templates,
+  Terraform modules, CDK constructs). This ADR defines the extension model: how
+  technologies add namespaced fields without breaking the core interface.
+
+technology_stack:
+  - category: tooling
+    name: JSON Schema
+    version: Draft 2020-12
+    rationale: Extension namespace schema definition with composition (allOf)
+  - category: tooling
+    name: YAML
+    version: N/A
+    rationale: Technology-specific extension serialization
+
+system_architecture:
+  components:
+    - id: COMP-0007
+      name: Extension Namespace Pattern
+      type: pattern
+      description: |
+        Technologies add fields under their own namespace key (e.g., cloudformation: {...})
+      responsibilities:
+        - Define namespace structure (technology key at artifact root)
+        - Ensure namespace isolation (no conflicts between technologies)
+        - Enable technology-specific innovation without core interface changes
+      interfaces:
+        - 'Namespace key matches technology enum value (e.g., technology=cloudformation, cloudformation namespace)'
+        
+    - id: COMP-0008
+      name: Extension Field Ownership
+      type: policy
+      description: |
+        Each technology owns and defines fields within its namespace
+      responsibilities:
+        - CloudFormation defines cloudformation namespace fields
+        - Terraform defines terraform namespace fields (future)
+        - Schema validation enforces namespace structure
+      interfaces:
+        - Extension schemas under schemas/{technology}/ directory
+
+  extension_structure:
+    pattern: |
+      seed:
+        # Core fields (universal)
+        id: SEED-0001
+        name: Example Seed
+        version: 1.0.0
+        technology: cloudformation
+        domains: [api, database]
+        tags: [serverless, production-ready]
+        adr_bundle: {...}
+        mutation_rules: {...}
+        composition: [...]
+        metadata: {...}
+        
+        # Extension namespace (CloudFormation-specific)
+        cloudformation:
+          templates:
+            - path: api-template.yaml
+            - path: database-template.yaml
+          parameters:
+            Environment: production
+          stack_policy: stack-policy.json
+          capabilities: [CAPABILITY_IAM]
+
+    discovery_model: |
+      Registries may separate or mix technologies based on technology discriminator.
+      Example: seeds-registry.yaml can list all seeds (mixed) or seeds-cloudformation-registry.yaml
+      (technology-specific). substrate-index.yaml provides canonical registry paths.
+
+  rationale:
+    flexibility: Technologies can innovate without breaking core interface
+    stability: Consumers depend on core fields only, extensions are opt-in
+    clarity: Explicit universal vs technology-specific separation
+    no_forced_uniformity: Each technology owns its namespace without compromise
+    familiar_pattern: Kubernetes CRDs, OpenAPI additionalProperties, JSON Schema oneOf
+
+  example_cloudformation_seed:
+    id: SEED-CFN-0001
+    name: Serverless API with DynamoDB
+    version: 1.0.0
+    technology: cloudformation
+    cloudformation:
+      templates:
+        - api-gateway-lambda.yaml
+        - dynamodb-table.yaml
+      parameters:
+        TableName: my-table
+      capabilities: [CAPABILITY_IAM]
+
+  example_terraform_seed_future:
+    id: SEED-TF-0001
+    name: Serverless API with DynamoDB
+    version: 1.0.0
+    technology: terraform
+    terraform:
+      modules:
+        - api-gateway-lambda
+        - dynamodb-table
+      providers:
+        - aws: ~> 5.0
+      variables:
+        table_name: my-table
+
+  schema_validation:
+    approach: |
+      Core schema validates core fields. Extension schemas validate namespace fields.
+      JSON Schema composition (allOf) combines core + extension validation.
+
+system_boundaries:
+  - id: SYSBOUND-0003
+    name: Extension Model Boundary
+    description: |
+      Defines how technologies add namespaced fields. Core interface stability
+      is preserved; technology extensions evolve independently.
+    external_dependencies:
+      - IaC technology providers for namespace definitions
+      - JSON Schema composition for validation
+
+usage_flow: |
+  1. Consumer reads artifact with technology discriminator
+  2. Consumer validates against core schema (universal)
+  3. Consumer validates against technology extension schema (e.g., cloudformation extension)
+  4. Consumer reads extension namespace for IaC-specific fields
+  5. Consumer projects IaC structure from extension namespace
+
+non_goals:
+  - Extension model does not define specific technology extensions (those go in ADR-PC)
+  - Extension model does not enforce technology schemas (consuming systems validate)

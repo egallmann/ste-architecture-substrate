@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0.0",
+  "metadata": {
+    "id": "s3-secure-bucket",
+    "name": "Secure S3 Bucket",
+    "description": "S3 bucket with AES256 encryption, versioning, public access block, and optional object lock. No logging or replication — add those in a composing bundle.",
+    "version": "1.0.0",
+    "technology": "cloudformation"
+  },
+  "cloudformation": {
+    "construct": "template.yaml",
+    "construct_type": "resource"
+  }
+}

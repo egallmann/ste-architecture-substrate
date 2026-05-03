@@ -1,0 +1,19 @@
+{
+  "entries": [
+    {
+      "id": "cloudformation",
+      "schemas": {
+        "building_block": "schemas/building-block-bundle.schema.json",
+        "building_block_extension": "schemas/cloudformation/bundle-extension.schema.json",
+        "mutation_rules": "schemas/mutation-rules.schema.json",
+        "mutation_rules_extension": "schemas/cloudformation/mutation-rules-extension.schema.json",
+        "primitive": "schemas/primitive-block.schema.json",
+        "primitive_extension": "schemas/cloudformation/primitive-extension.schema.json",
+        "seed": "schemas/seed.schema.json",
+        "seed_extension": "schemas/cloudformation/seed-extension.schema.json"
+      }
+    }
+  ],
+  "registry": "technologies",
+  "schema_version": "1.0.0"
+}

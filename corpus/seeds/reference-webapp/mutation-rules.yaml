@@ -1,0 +1,48 @@
+# Seed-level mutation rules for reference-webapp.
+# Logical-ID addressing per ADR-PC-0005.
+
+immutable:
+  # WAF WebACL scope cannot change after creation (CLOUDFRONT is global)
+  - SiteWebACL.Properties.Scope
+  # CloudFront OAC signing config must not change without updating bucket policy
+  - SiteOriginAccessControl.Properties.OriginAccessControlConfig.SigningProtocol
+  - SiteOriginAccessControl.Properties.OriginAccessControlConfig.SigningBehavior
+  # DynamoDB key schema cannot be changed after table creation
+  - AppTable.Properties.KeySchema
+  - AppTable.Properties.AttributeDefinitions
+  # Cognito pool schema cannot be changed after creation
+  - CognitoUserPool.Properties.Schema
+  # IAM role trust policies should not change without explicit review
+  - ApiHandlerRole.Properties.AssumeRolePolicyDocument
+  - JwtHandlerRole.Properties.AssumeRolePolicyDocument
+
+append_only:
+  # WAF rules — add managed rule groups, do not remove existing ones
+  - SiteWebACL.Properties.Rules
+  # Cognito auto-verified attributes — add attributes, do not remove
+  - CognitoUserPool.Properties.AutoVerifiedAttributes
+  # Lambda managed policies — add policies, do not remove execution role
+  - ApiHandlerRole.Properties.ManagedPolicyArns
+  - JwtHandlerRole.Properties.ManagedPolicyArns
+
+required:
+  # Core delivery resources that must exist
+  - SiteWebACL
+  - SiteContentBucket
+  - SiteDistribution
+  - SiteOriginAccessControl
+  # Auth resources
+  - CognitoUserPool
+  - CognitoUserPoolClient
+  # API resources
+  - RestApi
+  - ApiHandlerFunction
+  - AppTable
+
+metadata:
+  description: Seed-level rules for the reference-webapp pattern
+  rationale: >
+    CloudFront + WAF + Cognito resources have post-creation immutable properties;
+    DynamoDB key schema is immutable by the AWS API. Append-only rules prevent
+    accidental removal of WAF managed rules or Lambda permissions in updates.
+  enforcement_level: required
