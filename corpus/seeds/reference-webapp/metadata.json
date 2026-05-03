@@ -1,0 +1,49 @@
+{
+  "schema_version": "1.0.0",
+  "metadata": {
+    "id": "reference-webapp",
+    "name": "Reference Web Application",
+    "description": "Full-stack serverless web application: CloudFront + S3 static hosting, WAFv2, API Gateway REST API, Lambda, DynamoDB, and Cognito authentication. Derived from aws-cloudformation-templates Solutions/WebApp (Apache-2.0) and normalized as a substrate reference pattern.",
+    "version": "1.0.0",
+    "technology": "cloudformation",
+    "domains": ["web", "serverless", "auth", "api", "data"],
+    "tags": ["reference", "webapp", "cloudfront", "apigateway", "cognito", "lambda", "dynamodb", "waf"]
+  },
+  "adr_bundle": ["ADR-L-0001", "ADR-L-0003", "ADR-PS-0002", "ADR-PS-0004"],
+  "mutation_rules": "mutation-rules.yaml",
+  "composition": [
+    {"block_id": "static-site-delivery", "version": "1.0.0"},
+    {"block_id": "serverless-api", "version": "1.0.0"},
+    {"block_id": "cognito-auth", "version": "1.0.0"}
+  ],
+  "cloudformation": {
+    "templates": [
+      {
+        "id": "webapp",
+        "path": "webapp.yaml",
+        "description": "Complete reference web application (single-stack). Suitable as a working baseline; split into bundle stacks for independent lifecycle management.",
+        "stack_name_pattern": "{env}-reference-webapp"
+      }
+    ],
+    "parameters": {
+      "AppName": {
+        "type": "String",
+        "description": "Name prefix for all resources in this stack"
+      },
+      "Env": {
+        "type": "String",
+        "description": "Environment name (dev, staging, prod)",
+        "allowed_values": ["dev", "staging", "prod"]
+      },
+      "LambdaCodeS3Bucket": {
+        "type": "String",
+        "description": "S3 bucket containing Lambda deployment packages"
+      },
+      "LambdaCodeS3Key": {
+        "type": "String",
+        "description": "S3 object key for the API handler Lambda package"
+      }
+    },
+    "capabilities": ["CAPABILITY_IAM", "CAPABILITY_NAMED_IAM"]
+  }
+}

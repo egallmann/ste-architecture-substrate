@@ -1,0 +1,382 @@
+schema_version: '1.1'
+type: normalized_entity_registry
+entities:
+- id: COMP-0001
+  entity_type: component
+  name: substrate CLI
+  summary: '- Manage substrate artifacts (search, get, validate) - Generate discovery
+    bundles - Initialize substrate projects'
+  canonical_source:
+    source_type: physical_component_adr
+    source_ref: ADR-PC-0001#COMP-0001
+    artifact_path: adrs/physical-component/ADR-PC-0001-substrate-tooling-cli.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-PC-0001
+    legacy_component_id: COMP-0001
+    technologies: []
+    module_path: src/cli/substrate_cli.py
+    implements_capabilities: []
+    implements_system:
+    - ADR-PS-0001
+  relationships:
+    declared_in:
+    - ADR-PC-0001
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in:
+    - SYS-0001
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: physical_component_adr
+    source_ref: ADR-PC-0001#COMP-0001
+    extraction_phase: extract_component
+    classification: explicit
+    generator: adr-architecture-index
+- id: COMP-0002
+  entity_type: component
+  name: CloudFormation Seed
+  summary: '- Define complete CloudFormation architecture starting state - Provide
+    templates array with parameters and capabilities - Reference optional stack policy'
+  canonical_source:
+    source_type: physical_component_adr
+    source_ref: ADR-PC-0002#COMP-0002
+    artifact_path: adrs/physical-component/ADR-PC-0002-cloudformation-seed-artifact-structure.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-PC-0002
+    legacy_component_id: COMP-0002
+    technologies: []
+    module_path: schemas/cloudformation-seed.schema.json
+    implements_capabilities: []
+    implements_system:
+    - ADR-PS-0002
+  relationships:
+    declared_in:
+    - ADR-PC-0002
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in:
+    - SYS-0002
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: physical_component_adr
+    source_ref: ADR-PC-0002#COMP-0002
+    extraction_phase: extract_component
+    classification: explicit
+    generator: adr-architecture-index
+- id: COMP-0003
+  entity_type: component
+  name: CloudFormation Bundle
+  summary: '- Define reusable CloudFormation building block structure - Include mutation
+    rules for composition - Maintain ADR traceability'
+  canonical_source:
+    source_type: physical_component_adr
+    source_ref: ADR-PC-0003#COMP-0003
+    artifact_path: adrs/physical-component/ADR-PC-0003-cloudformation-building-block-bundle-structure.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-PC-0003
+    legacy_component_id: COMP-0003
+    technologies: []
+    module_path: schemas/cloudformation-bundle.schema.json
+    implements_capabilities: []
+    implements_system:
+    - ADR-PS-0002
+  relationships:
+    declared_in:
+    - ADR-PC-0003
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in:
+    - SYS-0002
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: physical_component_adr
+    source_ref: ADR-PC-0003#COMP-0003
+    extraction_phase: extract_component
+    classification: explicit
+    generator: adr-architecture-index
+- id: COMP-0004
+  entity_type: component
+  name: CloudFormation Primitive
+  summary: '- Define minimal CloudFormation primitive structure - Exclude ADR context
+    and mutation rules - Single template only'
+  canonical_source:
+    source_type: physical_component_adr
+    source_ref: ADR-PC-0004#COMP-0004
+    artifact_path: adrs/physical-component/ADR-PC-0004-cloudformation-primitive-block-structure.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-PC-0004
+    legacy_component_id: COMP-0004
+    technologies: []
+    module_path: schemas/cloudformation-primitive.schema.json
+    implements_capabilities: []
+    implements_system:
+    - ADR-PS-0002
+  relationships:
+    declared_in:
+    - ADR-PC-0004
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in:
+    - SYS-0002
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: physical_component_adr
+    source_ref: ADR-PC-0004#COMP-0004
+    extraction_phase: extract_component
+    classification: explicit
+    generator: adr-architecture-index
+- id: COMP-0005
+  entity_type: component
+  name: CloudFormation Mutation Rules
+  summary: '- Define mutation rules using CloudFormation logical ID addressing - Specify
+    immutable and append-only patterns - Document logical ID addressing model'
+  canonical_source:
+    source_type: physical_component_adr
+    source_ref: ADR-PC-0005#COMP-0005
+    artifact_path: adrs/physical-component/ADR-PC-0005-cloudformation-mutation-rules-schema.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-PC-0005
+    legacy_component_id: COMP-0005
+    technologies: []
+    module_path: schemas/mutation-rules.schema.json
+    implements_capabilities: []
+    implements_system:
+    - ADR-PS-0002
+  relationships:
+    declared_in:
+    - ADR-PC-0005
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in:
+    - SYS-0002
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: physical_component_adr
+    source_ref: ADR-PC-0005#COMP-0005
+    extraction_phase: extract_component
+    classification: explicit
+    generator: adr-architecture-index
+- id: COMP-0006
+  entity_type: component
+  name: CloudFormation Template Structure
+  summary: '- Define structural validity requirements for CloudFormation templates
+    - Reference cfn-lint validation - Document required sections'
+  canonical_source:
+    source_type: physical_component_adr
+    source_ref: ADR-PC-0006#COMP-0006
+    artifact_path: adrs/physical-component/ADR-PC-0006-cloudformation-template-structure-requirements.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-PC-0006
+    legacy_component_id: COMP-0006
+    technologies: []
+    module_path: docs/cloudformation-template-requirements.md
+    implements_capabilities: []
+    implements_system:
+    - ADR-PS-0002
+  relationships:
+    declared_in:
+    - ADR-PC-0006
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in:
+    - SYS-0002
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: physical_component_adr
+    source_ref: ADR-PC-0006#COMP-0006
+    extraction_phase: extract_component
+    classification: explicit
+    generator: adr-architecture-index
+- id: COMP-0007
+  entity_type: component
+  name: Stack Policy Integration
+  summary: '- Define stack policy integration for seeds - Reference stack policy files
+    - Document enforcement semantics'
+  canonical_source:
+    source_type: physical_component_adr
+    source_ref: ADR-PC-0007#COMP-0007
+    artifact_path: adrs/physical-component/ADR-PC-0007-cloudformation-stack-policy-integration.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-PC-0007
+    legacy_component_id: COMP-0007
+    technologies: []
+    module_path: schemas/cloudformation-seed.schema.json
+    implements_capabilities: []
+    implements_system:
+    - ADR-PS-0002
+  relationships:
+    declared_in:
+    - ADR-PC-0007
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in:
+    - SYS-0002
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: physical_component_adr
+    source_ref: ADR-PC-0007#COMP-0007
+    extraction_phase: extract_component
+    classification: explicit
+    generator: adr-architecture-index
+- id: COMP-0008
+  entity_type: component
+  name: Discovery Bundle Generator
+  summary: '- Generate substrate-index.json from artifacts - Generate substrate-manifest.yaml
+    - Generate artifact registries'
+  canonical_source:
+    source_type: physical_component_adr
+    source_ref: ADR-PC-0008#COMP-0008
+    artifact_path: adrs/physical-component/ADR-PC-0008-substrate-discovery-bundle-generation.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-PC-0008
+    legacy_component_id: COMP-0008
+    technologies: []
+    module_path: src/cli/compile.py
+    implements_capabilities: []
+    implements_system:
+    - ADR-PS-0001
+  relationships:
+    declared_in:
+    - ADR-PC-0008
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in:
+    - SYS-0001
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: physical_component_adr
+    source_ref: ADR-PC-0008#COMP-0008
+    extraction_phase: extract_component
+    classification: explicit
+    generator: adr-architecture-index
+- id: COMP-0009
+  entity_type: component
+  name: corpus_cli
+  summary: '- Walk corpus/ tree and build artifact inventory from metadata.json files
+    - Validate metadata files against JSON Schemas (seed, bundle, primitive) - Regenerate
+    discovery surface (substrate-index.json, substrate-manifest.'
+  canonical_source:
+    source_type: physical_component_adr
+    source_ref: ADR-PC-0009#COMP-0009
+    artifact_path: adrs/physical-component/ADR-PC-0009-corpus-maintenance-cli-tooling.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-PC-0009
+    legacy_component_id: COMP-0009
+    technologies: []
+    module_path: tools/corpus_cli.py
+    implements_capabilities: []
+    implements_system:
+    - ADR-PS-0001
+  relationships:
+    declared_in:
+    - ADR-PC-0009
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in:
+    - SYS-0001
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: physical_component_adr
+    source_ref: ADR-PC-0009#COMP-0009
+    extraction_phase: extract_component
+    classification: explicit
+    generator: adr-architecture-index

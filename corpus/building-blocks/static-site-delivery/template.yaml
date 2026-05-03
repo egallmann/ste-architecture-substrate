@@ -1,0 +1,228 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Static site delivery: S3 content bucket (versioned, replicated, logged) with CloudFront
+  Origin Access Control distribution and WAFv2 (AWS Managed Rules, CLOUDFRONT scope).
+  Building block extracted from the reference-webapp substrate pattern.
+
+Parameters:
+  AppName:
+    Type: String
+    AllowedPattern: ^[a-z0-9-]{3,40}$
+
+  Env:
+    Type: String
+    AllowedValues: [dev, staging, prod]
+    Default: dev
+
+Resources:
+
+  SiteWebACL:
+    Type: AWS::WAFv2::WebACL
+    Properties:
+      Name: !Sub ${AppName}-webacl
+      Scope: CLOUDFRONT
+      Description: WAF with AWS Managed Common Rule Set
+      DefaultAction:
+        Allow: {}
+      VisibilityConfig:
+        SampledRequestsEnabled: true
+        CloudWatchMetricsEnabled: true
+        MetricName: !Sub ${AppName}-webacl
+      Tags:
+        - Key: AppName
+          Value: !Ref AppName
+        - Key: Env
+          Value: !Ref Env
+      Rules:
+        - Name: AWS-AWSManagedRulesCommonRuleSet
+          Priority: 0
+          OverrideAction:
+            None: {}
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: !Sub ${AppName}-amr-crs
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesCommonRuleSet
+
+  SiteContentLogBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub ${AppName}-content-logs-${AWS::Region}-${AWS::AccountId}
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      ObjectLockEnabled: true
+      ObjectLockConfiguration:
+        ObjectLockEnabled: Enabled
+        Rule:
+          DefaultRetention:
+            Mode: COMPLIANCE
+            Years: 1
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Enabled
+
+  SiteContentReplicaBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub ${AppName}-content-replica-${AWS::Region}-${AWS::AccountId}
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Enabled
+
+  SiteContentReplicationRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: s3.amazonaws.com
+            Action: sts:AssumeRole
+      Path: /
+
+  SiteContentReplicationPolicy:
+    Type: AWS::IAM::RolePolicy
+    Properties:
+      RoleName: !Ref SiteContentReplicationRole
+      PolicyName: content-replication
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action: [s3:GetReplicationConfiguration, s3:ListBucket]
+            Resource: !Sub arn:${AWS::Partition}:s3:::${AppName}-content-${AWS::Region}-${AWS::AccountId}
+          - Effect: Allow
+            Action: [s3:GetObjectVersionForReplication, s3:GetObjectVersionAcl, s3:GetObjectVersionTagging]
+            Resource: !Sub arn:${AWS::Partition}:s3:::${AppName}-content-${AWS::Region}-${AWS::AccountId}/*
+          - Effect: Allow
+            Action: [s3:ReplicateObject, s3:ReplicateDelete, s3:ReplicationTags]
+            Resource: !Sub arn:${AWS::Partition}:s3:::${AppName}-content-replica-${AWS::Region}-${AWS::AccountId}/*
+
+  SiteContentBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub ${AppName}-content-${AWS::Region}-${AWS::AccountId}
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      LoggingConfiguration:
+        DestinationBucketName: !Ref SiteContentLogBucket
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      ReplicationConfiguration:
+        Role: !GetAtt SiteContentReplicationRole.Arn
+        Rules:
+          - Status: Enabled
+            Destination:
+              Bucket: !GetAtt SiteContentReplicaBucket.Arn
+      VersioningConfiguration:
+        Status: Enabled
+
+  SiteContentBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref SiteContentBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowCloudFrontOAC
+            Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: s3:GetObject
+            Resource: !Sub arn:${AWS::Partition}:s3:::${AppName}-content-${AWS::Region}-${AWS::AccountId}/*
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub arn:${AWS::Partition}:cloudfront::${AWS::AccountId}:distribution/${SiteDistribution.Id}
+          - Sid: DenyInsecureTransport
+            Effect: Deny
+            Principal:
+              AWS: '*'
+            Action: s3:*
+            Resource:
+              - !Sub arn:${AWS::Partition}:s3:::${AppName}-content-${AWS::Region}-${AWS::AccountId}
+              - !Sub arn:${AWS::Partition}:s3:::${AppName}-content-${AWS::Region}-${AWS::AccountId}/*
+            Condition:
+              Bool:
+                aws:SecureTransport: false
+
+  SiteOriginAccessControl:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: !Sub ${AppName}-oac
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+
+  SiteDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Comment: !Sub ${AppName} static delivery (${Env})
+        Enabled: true
+        DefaultRootObject: index.html
+        HttpVersion: http2
+        IPV6Enabled: true
+        WebACLId: !GetAtt SiteWebACL.Arn
+        Origins:
+          - Id: !Sub ${AppName}-s3-origin
+            DomainName: !GetAtt SiteContentBucket.RegionalDomainName
+            OriginAccessControlId: !GetAtt SiteOriginAccessControl.Id
+            S3OriginConfig:
+              OriginAccessIdentity: ''
+        DefaultCacheBehavior:
+          TargetOriginId: !Sub ${AppName}-s3-origin
+          ViewerProtocolPolicy: redirect-to-https
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
+          Compress: true
+        ViewerCertificate:
+          CloudFrontDefaultCertificate: true
+
+Outputs:
+  DistributionId:
+    Value: !Ref SiteDistribution
+    Export:
+      Name: !Sub ${AWS::StackName}-DistributionId
+
+  DistributionDomain:
+    Value: !GetAtt SiteDistribution.DomainName
+    Export:
+      Name: !Sub ${AWS::StackName}-DistributionDomain
+
+  ContentBucketName:
+    Value: !Ref SiteContentBucket
+    Export:
+      Name: !Sub ${AWS::StackName}-ContentBucketName
+
+  ContentBucketArn:
+    Value: !GetAtt SiteContentBucket.Arn
+    Export:
+      Name: !Sub ${AWS::StackName}-ContentBucketArn
+
+  WebACLArn:
+    Value: !GetAtt SiteWebACL.Arn
+    Export:
+      Name: !Sub ${AWS::StackName}-WebACLArn

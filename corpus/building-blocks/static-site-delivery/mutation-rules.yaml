@@ -1,0 +1,19 @@
+immutable:
+  - SiteWebACL.Properties.Scope
+  - SiteOriginAccessControl.Properties.OriginAccessControlConfig.SigningProtocol
+  - SiteOriginAccessControl.Properties.OriginAccessControlConfig.SigningBehavior
+  - SiteContentReplicationRole.Properties.AssumeRolePolicyDocument
+
+append_only:
+  - SiteWebACL.Properties.Rules
+  - SiteContentReplicationRole.Properties.ManagedPolicyArns
+
+required:
+  - SiteWebACL
+  - SiteContentBucket
+  - SiteDistribution
+  - SiteOriginAccessControl
+
+metadata:
+  description: Static site delivery bundle mutation rules
+  enforcement_level: required

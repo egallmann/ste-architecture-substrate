@@ -1,0 +1,60 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ste-architecture-substrate.local/schemas/cloudformation/bundle-extension.schema.json",
+  "title": "CloudFormation building block bundle extension",
+  "description": "Technology-specific namespace for CloudFormation bundles. Validate together with ../building-block-bundle.schema.json via allOf.",
+  "type": "object",
+  "required": ["cloudformation"],
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "required": ["technology"],
+      "properties": {
+        "technology": {
+          "type": "string",
+          "const": "cloudformation"
+        }
+      }
+    },
+    "cloudformation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["template"],
+      "properties": {
+        "template": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Path to the bundle CloudFormation template relative to bundle root."
+        },
+        "mutation_rules": {
+          "type": "string",
+          "description": "Optional duplicate pointer when rules path is only recorded under cloudformation (prefer core mutation_rules)."
+        },
+        "fragment_type": {
+          "type": "string",
+          "enum": ["resources", "nested_stack", "macro"]
+        },
+        "integration_points": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Opaque integration metadata for composition (consumer-defined shape)."
+        },
+        "required_parameters": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        },
+        "exports": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "Human-readable descriptions of stack outputs / exports."
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ste-architecture-substrate.local/schemas/cloudformation/primitive-extension.schema.json",
+  "title": "CloudFormation primitive extension",
+  "description": "Technology-specific namespace for CloudFormation primitives. Validate together with ../primitive-block.schema.json via allOf.",
+  "type": "object",
+  "required": ["cloudformation"],
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "required": ["technology"],
+      "properties": {
+        "technology": {
+          "type": "string",
+          "const": "cloudformation"
+        }
+      }
+    },
+    "cloudformation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["construct", "construct_type"],
+      "properties": {
+        "construct": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Path to resource fragment, parameter file, output snippet, or condition snippet."
+        },
+        "construct_type": {
+          "type": "string",
+          "enum": ["resource", "parameter", "output", "condition"]
+        }
+      }
+    }
+  }
+}

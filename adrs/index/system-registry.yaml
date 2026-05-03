@@ -1,0 +1,161 @@
+schema_version: '1.1'
+type: normalized_entity_registry
+entities:
+- id: SYS-0001
+  entity_type: system
+  name: Substrate System Structure
+  summary: 'ADR-L-0001 defines ste-architecture-substrate as a storage and structuring
+    system for architecture artifacts. This physical system ADR defines the concrete
+    system structure: components, their relationships, and how exter'
+  canonical_source:
+    source_type: physical_system_adr
+    source_ref: ADR-PS-0001
+    artifact_path: adrs/physical-system/ADR-PS-0001-substrate-system-structure.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-PS-0001
+    implements_logical:
+    - ADR-L-0001
+    technologies: []
+  relationships:
+    declared_in:
+    - ADR-PS-0001
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in: []
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: physical_system_adr
+    source_ref: ADR-PS-0001
+    extraction_phase: extract_system
+    classification: explicit
+    generator: adr-architecture-index
+- id: SYS-0002
+  entity_type: system
+  name: Core Artifact Interface Contract
+  summary: 'ste-architecture-substrate must support multiple IaC technologies (CloudFormation,
+    Terraform, SAM, CDK) while providing a stable consumption interface. This ADR
+    defines the core artifact interface contract: universal fie'
+  canonical_source:
+    source_type: physical_system_adr
+    source_ref: ADR-PS-0002
+    artifact_path: adrs/physical-system/ADR-PS-0002-core-artifact-interface-contract.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-PS-0002
+    implements_logical:
+    - ADR-L-0001
+    - ADR-L-0004
+    technologies: []
+  relationships:
+    declared_in:
+    - ADR-PS-0002
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in: []
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: physical_system_adr
+    source_ref: ADR-PS-0002
+    extraction_phase: extract_system
+    classification: explicit
+    generator: adr-architecture-index
+- id: SYS-0003
+  entity_type: system
+  name: Technology Extension Model
+  summary: 'ADR-PS-0002 defines the core artifact interface with technology-agnostic
+    fields. Different IaC technologies need technology-specific fields (CloudFormation
+    templates, Terraform modules, CDK constructs). This ADR defines '
+  canonical_source:
+    source_type: physical_system_adr
+    source_ref: ADR-PS-0003
+    artifact_path: adrs/physical-system/ADR-PS-0003-technology-extension-model.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-PS-0003
+    implements_logical:
+    - ADR-L-0001
+    - ADR-L-0004
+    technologies: []
+  relationships:
+    declared_in:
+    - ADR-PS-0003
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in: []
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: physical_system_adr
+    source_ref: ADR-PS-0003
+    extraction_phase: extract_system
+    classification: explicit
+    generator: adr-architecture-index
+- id: SYS-0004
+  entity_type: system
+  name: Artifact Composition Model
+  summary: 'Architecture seeds are complete starting architectures, building block
+    bundles are reusable components, and primitive blocks are low-level constructs.
+    This ADR defines how these artifacts compose: seeds compose building '
+  canonical_source:
+    source_type: physical_system_adr
+    source_ref: ADR-PS-0004
+    artifact_path: adrs/physical-system/ADR-PS-0004-artifact-composition-model.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-PS-0004
+    implements_logical:
+    - ADR-L-0001
+    technologies: []
+  relationships:
+    declared_in:
+    - ADR-PS-0004
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in: []
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: physical_system_adr
+    source_ref: ADR-PS-0004
+    extraction_phase: extract_system
+    classification: explicit
+    generator: adr-architecture-index

@@ -1,0 +1,18 @@
+immutable:
+  - ApiHandlerRole.Properties.AssumeRolePolicyDocument
+  - JwtHandlerRole.Properties.AssumeRolePolicyDocument
+
+append_only:
+  - ApiHandlerRole.Properties.ManagedPolicyArns
+  - JwtHandlerRole.Properties.ManagedPolicyArns
+
+required:
+  - RestApi
+  - ApiHandlerFunction
+  - JwtHandlerFunction
+  - RestApiAuthorizer
+  - RestApiStage
+
+metadata:
+  description: Serverless API bundle mutation rules
+  enforcement_level: required

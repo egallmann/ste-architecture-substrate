@@ -1,0 +1,25 @@
+# ADR ID allocation state for ste-architecture-substrate.
+# The `allocation` block is read by adr-architecture-kit (adr next-id).
+# The `entity_allocation` block is a human/agent reference — adr-kit ignores it.
+# Each value is the NEXT id to assign (not the last used).
+#
+# NOTE: COMP IDs currently overlap between ADR-PS (0001-0011) and ADR-PC (0001-0009).
+# This is a pre-existing conflict to resolve during Phase 7 adr validate.
+# Until resolved, treat COMP next as 0012 (above the highest seen value).
+
+allocation:
+  logical: 6
+  physical-system: 5
+  physical-component: 10
+
+entity_allocation:
+  CAP: 16       # last used: CAP-0015 (ADR-L-0005)
+  DEC: 30       # last used: DEC-0029 (ADR-PC-0009)
+  INV: 17       # last used: INV-0016 (ADR-L-0005)
+  COMP: 12      # last used: COMP-0011 (ADR-PS-0004) — see COMP overlap note above
+  COMPBOUND: 10 # last used: COMPBOUND-0009 (ADR-PC-0009)
+  IFACE: 10     # last used: IFACE-0009 (ADR-PC-0009)
+  IMPL: 18      # last used: IMPL-0017 (ADR-PC-0009)
+  CONTRACT: 5   # last used: CONTRACT-0004 (ADR-L-0004)
+  BOUND: 5      # last used: BOUND-0004 (ADR-L-0005)
+  CONST: 13     # last used: CONST-0012 (ADR-PC-0009)

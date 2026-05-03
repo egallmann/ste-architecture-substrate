@@ -1,0 +1,30 @@
+{
+  "entries": [
+    {
+      "id": "lambda-execution-role",
+      "metadata_file": "corpus/primitives/lambda-execution-role/metadata.json",
+      "name": "Lambda Execution Role",
+      "technology": "cloudformation",
+      "template": "corpus/primitives/lambda-execution-role/template.yaml",
+      "version": "1.0.0"
+    },
+    {
+      "id": "lambda-function",
+      "metadata_file": "corpus/primitives/lambda-function/metadata.json",
+      "name": "Lambda Function",
+      "technology": "cloudformation",
+      "template": "corpus/primitives/lambda-function/template.yaml",
+      "version": "1.0.0"
+    },
+    {
+      "id": "s3-secure-bucket",
+      "metadata_file": "corpus/primitives/s3-secure-bucket/metadata.json",
+      "name": "Secure S3 Bucket",
+      "technology": "cloudformation",
+      "template": "corpus/primitives/s3-secure-bucket/template.yaml",
+      "version": "1.0.0"
+    }
+  ],
+  "registry": "primitives",
+  "schema_version": "1.0.0"
+}

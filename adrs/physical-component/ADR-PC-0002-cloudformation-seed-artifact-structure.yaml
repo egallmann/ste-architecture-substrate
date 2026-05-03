@@ -1,0 +1,187 @@
+schema_version: '1.0'
+adr_type: physical-component
+id: ADR-PC-0002
+title: CloudFormation Seed Artifact Structure
+status: proposed
+created_date: '2026-05-02'
+authors:
+- Erik Gallmann
+implements_logical:
+- ADR-L-0001
+implements_system:
+- ADR-PS-0002
+domains:
+- cloudformation
+context: |
+  CloudFormation seed artifacts define complete architecture starting states as collections
+  of CloudFormation templates with metadata, parameters, capabilities, and optional stack
+  policies. Seeds represent "Architecture IR in CloudFormation form" and provide the baseline
+  from which building blocks compose.
+  
+  Key characteristics:
+  - Contains one or more CloudFormation templates as an array
+  - Declares required parameters and their types
+  - Specifies CloudFormation capabilities needed for deployment
+  - Optionally references stack policy for operational governance
+  - Includes ADR traceability via metadata
+component_specifications:
+  - id: COMP-0002
+    name: CloudFormation Seed
+    type: library
+    responsibilities: |
+      - Define complete CloudFormation architecture starting state
+      - Provide templates array with parameters and capabilities
+      - Reference optional stack policy
+    generation_context:
+      purpose: Define CloudFormation seed artifact structure
+      key_responsibilities:
+        - Template array structure
+        - Parameters and capabilities
+        - Stack policy integration
+      constraints:
+        - Must be valid CloudFormation
+    interfaces:
+      - id: IFACE-0002
+        type: library_api
+        specification: |
+          CloudFormation Seed Structure (JSON Schema):
+          
+          ```json
+          {
+            "metadata": {
+              "id": "string (unique seed identifier)",
+              "name": "string (human-readable name)",
+              "description": "string (purpose and scope)",
+              "version": "string (semver)",
+              "technology": "cloudformation",
+              "adr_references": ["ADR-L-XXXX", "ADR-PS-YYYY"]
+            },
+            "cloudformation": {
+              "templates": [
+                {
+                  "id": "string (template identifier, e.g., 'vpc', 'network')",
+                  "path": "string (relative path to template file)",
+                  "description": "string (template purpose)",
+                  "stack_name_pattern": "string (optional, e.g., '{env}-vpc-{region}')"
+                }
+              ],
+              "parameters": {
+                "ParameterName": {
+                  "type": "String|Number|CommaDelimitedList",
+                  "description": "string",
+                  "default": "any (optional)",
+                  "allowed_values": ["value1", "value2"] // optional
+                }
+              },
+              "capabilities": [
+                "CAPABILITY_IAM",
+                "CAPABILITY_NAMED_IAM",
+                "CAPABILITY_AUTO_EXPAND"
+              ],
+              "stack_policy": "string (optional, relative path to stack policy JSON)"
+            }
+          }
+          ```
+          
+          Example Seed Directory Structure:
+          ```
+          seeds/vpc-baseline/
+            metadata.json           # Seed metadata with ADR references
+            vpc-main.yaml          # Primary VPC template
+            vpc-endpoints.yaml     # VPC endpoint template
+            stack-policy.json      # Optional stack policy
+          ```
+          
+          Example metadata.json:
+          ```json
+          {
+            "metadata": {
+              "id": "vpc-baseline",
+              "name": "VPC Baseline Architecture",
+              "description": "Multi-AZ VPC with public/private subnets and VPC endpoints",
+              "version": "1.0.0",
+              "technology": "cloudformation",
+              "adr_references": ["ADR-L-0001", "ADR-PS-0002"]
+            },
+            "cloudformation": {
+              "templates": [
+                {
+                  "id": "vpc-main",
+                  "path": "vpc-main.yaml",
+                  "description": "Core VPC with subnets, route tables, NAT gateways",
+                  "stack_name_pattern": "{env}-vpc-{region}"
+                },
+                {
+                  "id": "vpc-endpoints",
+                  "path": "vpc-endpoints.yaml",
+                  "description": "VPC endpoints for S3, DynamoDB, ECR"
+                }
+              ],
+              "parameters": {
+                "Environment": {
+                  "type": "String",
+                  "description": "Environment name (dev, staging, prod)",
+                  "allowed_values": ["dev", "staging", "prod"]
+                },
+                "VpcCidr": {
+                  "type": "String",
+                  "description": "CIDR block for VPC",
+                  "default": "10.0.0.0/16"
+                }
+              },
+              "capabilities": ["CAPABILITY_IAM"],
+              "stack_policy": "stack-policy.json"
+            }
+          }
+          ```
+    implementation_identifiers:
+      module_path: schemas/cloudformation-seed.schema.json
+    implementation_requirements:
+      error_handling:
+        strategy: Schema validation errors
+      observability:
+        logging:
+          level: info
+          structured: false
+        metrics:
+          - name: seed_validations_total
+            type: counter
+      testing_requirements:
+        unit_test_coverage: '>= 80%'
+technology_stack:
+  - category: infrastructure
+    name: AWS CloudFormation
+    version: N/A
+    rationale: Primary IaC technology
+deployment_model:
+  storage: seeds/ directory
+system_boundaries:
+  - id: COMPBOUND-0002
+    name: CloudFormation Seed Boundary
+    description: CloudFormation-specific artifact structure
+    external_dependencies:
+      - AWS CloudFormation schema
+implementation_decisions:
+  - id: IMPL-0003
+    summary: Templates as array rather than single file
+    rationale: |
+      Enables logical separation of concerns (e.g., VPC core vs VPC endpoints) while maintaining
+      a single seed identity. Supports staged deployment and independent stack lifecycle.
+  - id: IMPL-0004
+    summary: Explicit capabilities declaration
+    rationale: |
+      Forces seed authors to acknowledge IAM/macro capabilities required by templates, improving
+      security review and deployment automation safety.
+constraints:
+  - id: CONST-0003
+    type: technical
+    description: Template paths must be relative to seed root directory
+    rationale: Enables portable seed distribution and eliminates absolute path dependencies
+  - id: CONST-0004
+    type: technical
+    description: Stack policy must be valid CloudFormation stack policy JSON if present
+    rationale: Ensures operational governance rules are enforceable at deployment time
+non_goals:
+  - Does not deploy stacks (deployment tooling responsibility)
+  - Does not validate template CloudFormation syntax (cfn-lint responsibility, see ADR-PC-0006)
+  - Does not enforce parameter constraints at seed definition time

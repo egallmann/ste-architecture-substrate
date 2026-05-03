@@ -1,0 +1,218 @@
+schema_version: '1.0'
+adr_type: logical
+id: ADR-L-0004
+title: Substrate Consumption and Discovery
+status: proposed
+created_date: '2026-05-02'
+authors:
+- Erik Gallmann
+domains:
+- architecture
+- integration
+- discovery
+
+context: |
+  Substrate artifacts (seeds, building blocks, primitives) must be discoverable
+  and consumable by external systems: adr-architecture-kit extensions (project into
+  ADR-PC), conversation engines (select and retrieve artifacts), and ste-runtime
+  (reference in workspace compilation).
+  
+  The STE ecosystem has established file-based consumption patterns (conventional
+  paths, discovery bundles, manifests, sibling repo resolution) used by ste-kernel,
+  adr-kit, and ste-runtime. Substrate must follow these patterns for consistency.
+  
+  This ADR defines the consumption interface, discovery mechanism, artifact resolution,
+  and integration model with existing STE systems.
+
+decisions:
+- id: DEC-0019
+  summary: |
+    Substrate uses file-based consumption interface following STE conventions: conventional
+    directory paths, discovery bundles, manifest files, sibling repo resolution.
+  rationale: |
+    Consistency with STE ecosystem. ste-kernel, adr-kit, and ste-runtime use file-based
+    consumption (no HTTP APIs, no service dependencies). Conventional paths enable
+    predictable artifact location. Discovery bundles (substrate-index.yaml) provide
+    machine-readable catalogs. Sibling repo resolution enables workspace-style multi-repo
+    integration. File-based approach is simple, portable, and works in offline/air-gapped
+    environments.
+
+- id: DEC-0020
+  summary: |
+    Discovery mechanism: substrate-index.yaml (entrypoint), substrate-manifest.yaml
+    (metadata), registries (artifacts by type).
+  rationale: |
+    Follows STE pattern used in adr-kit and ste-runtime: index file as entrypoint,
+    manifest for generation metadata, registries for typed artifact lists. Index
+    provides stable paths to registries and generation info. Manifest provides per-artifact
+    summaries and statistics. Registries enable technology filtering (list all CloudFormation
+    seeds, all Terraform bundles, etc.).
+
+- id: DEC-0021
+  summary: |
+    Artifact resolution: consumers read from conventional paths (seeds/, building-blocks/,
+    primitives/) via substrate-index references, with optional sibling repo resolution
+    for cross-repo integration.
+  rationale: |
+    Conventional paths reduce coordination overhead. Consumers know to look in seeds/
+    for seeds, building-blocks/ for bundles. Substrate-index provides canonical registry
+    paths (handles layout variations). Sibling repo resolution (../ste-architecture-substrate)
+    enables workspace-style consumption without hardcoded absolute paths.
+
+- id: DEC-0022
+  summary: |
+    Integration model: substrate provides artifacts, consuming systems perform projection,
+    interpretation, validation, and enforcement.
+  rationale: |
+    Clear separation of concerns. Substrate is a storage and structuring layer. adr-kit
+    extensions project seeds into ADR-PC (deterministic structure + interpretive
+    intent). Conversation engines select seeds based on conversation context. ste-runtime
+    may reference substrate artifacts in workspace manifests. Substrate does not
+    perform projection (no logic to convert seeds to ADRs), does not validate (consumers
+    own validation), does not enforce (external systems own enforcement).
+
+- id: DEC-0023
+  summary: Substrate does not provide HTTP API, service endpoints, or runtime query interfaces.
+  rationale: |
+    File-based consumption is sufficient for STE ecosystem use cases and avoids
+    operational complexity (no service to deploy, monitor, scale). Consuming systems
+    are local tools (adr CLI, ste CLI, conversation engine plugins) that access
+    file systems directly. If remote access needed in future, consuming systems can
+    implement (e.g., clone substrate repo, mount as volume, S3-backed file system).
+
+capabilities:
+- id: CAP-0010
+  name: File-Based Discovery
+  description: Provide substrate-index.yaml and substrate-manifest.yaml for artifact discovery
+  
+- id: CAP-0011
+  name: Conventional Paths
+  description: Organize artifacts in predictable directory structure (seeds/, building-blocks/, primitives/)
+  
+- id: CAP-0012
+  name: Technology Filtering
+  description: Enable consumers to filter artifacts by IaC technology via metadata
+
+architectural_boundaries:
+- id: BOUND-0001
+  name: Included Responsibilities
+  description: |
+    File-based consumption interface, discovery bundle provision, conventional path
+    organization
+  rationale: |
+    File-based consumption follows STE patterns, avoids operational complexity, and
+    works in offline environments
+
+- id: BOUND-0002
+  name: Excluded Responsibilities
+  description: |
+    HTTP APIs, service endpoints, runtime query interfaces, projection logic, validation
+    logic, enforcement logic (all owned by consuming systems)
+  rationale: |
+    Substrate is a storage layer; consuming systems own projection, validation, and
+    enforcement to maintain clear separation of concerns
+
+interaction_contracts:
+- id: CONTRACT-0001
+  description: |
+    adr-architecture-kit integration: adr-kit extensions read substrate artifacts,
+    project into ADR-PC (structure deterministic, intent interpretive)
+  parties:
+    - ste-architecture-substrate
+    - adr-architecture-kit
+  protocol: File-based artifact retrieval with deterministic projection
+  guarantees: |
+    IaC structure is projection-ready (1:1 mapping). Mutation rules guide ADR generation.
+    ADR context prose is non-authoritative guidance.
+
+- id: CONTRACT-0002
+  description: |
+    Conversation engine integration: engines query substrate-index for available
+    seeds/blocks, retrieve artifacts based on conversation context
+  parties:
+    - ste-architecture-substrate
+    - conversation engines
+  protocol: Query substrate-index, filter by metadata, retrieve artifacts
+  guarantees: |
+    substrate-index lists all artifacts with complete metadata. Technology discriminator
+    enables filtering. Artifacts are self-contained (no broken references).
+
+- id: CONTRACT-0003
+  description: |
+    ste-runtime integration: ste-runtime may reference substrate artifacts in workspace
+    manifests (optional capability)
+  parties:
+    - ste-architecture-substrate
+    - ste-runtime
+  protocol: Sibling repo resolution or explicit path reference
+  guarantees: |
+    Sibling repo paths follow STE workspace conventions. Artifacts remain stable
+    across substrate versions. Optional integration does not break ste-runtime
+    if absent.
+
+- id: CONTRACT-0004
+  description: |
+    Discovery flow: read substrate-index.yaml → resolve registry paths → read registries
+    → filter by technology/tags → retrieve artifact by id
+  parties:
+    - ste-architecture-substrate
+    - consuming systems
+  protocol: Multi-step YAML file traversal with technology filtering
+  guarantees: |
+    substrate-index provides canonical registry paths. Registries are efficiently
+    parseable YAML. Artifact IDs are unique within technology scope.
+
+constraints:
+- id: CONST-0001
+  description: Substrate must not implement projection logic (consuming systems own this)
+  type: technical
+  rationale: Projection is the responsibility of consuming systems
+  
+- id: CONST-0002
+  description: Substrate must not implement validation logic (consuming systems own this)
+  type: technical
+  rationale: Validation is the responsibility of consuming systems
+  
+- id: CONST-0003
+  description: Substrate must not provide HTTP APIs or service endpoints
+  type: technical
+  rationale: File-based consumption is sufficient for STE ecosystem
+
+invariants:
+- id: INV-0011
+  statement: |
+    File-based consumption follows STE conventions (conventional paths, discovery
+    bundles, sibling repo resolution)
+  scope: global
+  enforcement_level: must
+  enforcement_mechanism: design
+  verification_method: manual
+  rationale: Consistency with STE ecosystem patterns
+  compliance_frameworks: []
+  exceptions: []
+  
+- id: INV-0012
+  statement: |
+    Discovery bundles are derived (generated from canonical artifacts), not hand-edited
+  scope: global
+  enforcement_level: must
+  enforcement_mechanism: policy
+  verification_method: automated
+  rationale: Ensures discovery bundles accurately reflect canonical artifacts
+  compliance_frameworks: []
+  exceptions: []
+  
+- id: INV-0013
+  statement: |
+    Substrate provides artifacts, consuming systems perform projection/interpretation/validation
+  scope: global
+  enforcement_level: must
+  enforcement_mechanism: design
+  verification_method: manual
+  rationale: Maintains clear separation of concerns
+  compliance_frameworks: []
+  exceptions: []
+
+non_functional_requirements: []
+
+gaps: []

@@ -1,0 +1,143 @@
+{
+  "counts": {
+    "building_blocks": 3,
+    "primitives": 3,
+    "seeds": 1,
+    "total": 7
+  },
+  "entries": [
+    {
+      "dependencies": [
+        "static-site-delivery"
+      ],
+      "domains": [
+        "auth",
+        "identity"
+      ],
+      "id": "cognito-auth",
+      "metadata_file": "corpus/building-blocks/cognito-auth/metadata.json",
+      "name": "Cognito Authentication",
+      "path": "corpus/building-blocks/cognito-auth",
+      "tags": [
+        "cognito",
+        "oauth2",
+        "userpool",
+        "hosted-ui",
+        "authentication"
+      ],
+      "technology": "cloudformation",
+      "type": "building_block",
+      "version": "1.0.0"
+    },
+    {
+      "dependencies": [
+        "cognito-auth"
+      ],
+      "domains": [
+        "api",
+        "serverless",
+        "auth"
+      ],
+      "id": "serverless-api",
+      "metadata_file": "corpus/building-blocks/serverless-api/metadata.json",
+      "name": "Serverless REST API",
+      "path": "corpus/building-blocks/serverless-api",
+      "tags": [
+        "apigateway",
+        "lambda",
+        "cognito-authorizer",
+        "dynamodb",
+        "jwt",
+        "proxy"
+      ],
+      "technology": "cloudformation",
+      "type": "building_block",
+      "version": "1.0.0"
+    },
+    {
+      "domains": [
+        "web",
+        "cdn",
+        "security"
+      ],
+      "id": "static-site-delivery",
+      "metadata_file": "corpus/building-blocks/static-site-delivery/metadata.json",
+      "name": "Static Site Delivery",
+      "path": "corpus/building-blocks/static-site-delivery",
+      "tags": [
+        "cloudfront",
+        "s3",
+        "waf",
+        "oac",
+        "static-hosting",
+        "replication"
+      ],
+      "technology": "cloudformation",
+      "type": "building_block",
+      "version": "1.0.0"
+    },
+    {
+      "id": "lambda-execution-role",
+      "metadata_file": "corpus/primitives/lambda-execution-role/metadata.json",
+      "name": "Lambda Execution Role",
+      "path": "corpus/primitives/lambda-execution-role",
+      "technology": "cloudformation",
+      "type": "primitive",
+      "version": "1.0.0"
+    },
+    {
+      "id": "lambda-function",
+      "metadata_file": "corpus/primitives/lambda-function/metadata.json",
+      "name": "Lambda Function",
+      "path": "corpus/primitives/lambda-function",
+      "technology": "cloudformation",
+      "type": "primitive",
+      "version": "1.0.0"
+    },
+    {
+      "id": "s3-secure-bucket",
+      "metadata_file": "corpus/primitives/s3-secure-bucket/metadata.json",
+      "name": "Secure S3 Bucket",
+      "path": "corpus/primitives/s3-secure-bucket",
+      "technology": "cloudformation",
+      "type": "primitive",
+      "version": "1.0.0"
+    },
+    {
+      "composition": [
+        "static-site-delivery",
+        "serverless-api",
+        "cognito-auth"
+      ],
+      "domains": [
+        "web",
+        "serverless",
+        "auth",
+        "api",
+        "data"
+      ],
+      "id": "reference-webapp",
+      "metadata_file": "corpus/seeds/reference-webapp/metadata.json",
+      "name": "Reference Web Application",
+      "path": "corpus/seeds/reference-webapp",
+      "tags": [
+        "reference",
+        "webapp",
+        "cloudfront",
+        "apigateway",
+        "cognito",
+        "lambda",
+        "dynamodb",
+        "waf"
+      ],
+      "technology": "cloudformation",
+      "type": "seed",
+      "version": "1.0.0"
+    }
+  ],
+  "generated_at": "2026-05-02",
+  "schema_version": "1.0.0",
+  "source_branch": "feature/substrate-design",
+  "source_repository": "ste-architecture-substrate",
+  "version": "1.0.0"
+}

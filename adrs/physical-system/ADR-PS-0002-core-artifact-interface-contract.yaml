@@ -1,0 +1,151 @@
+schema_version: '1.0'
+adr_type: physical-system
+id: ADR-PS-0002
+title: Core Artifact Interface Contract
+status: proposed
+created_date: '2026-05-02'
+authors:
+- Erik Gallmann
+implements_logical:
+- ADR-L-0001
+- ADR-L-0004
+domains:
+- architecture
+- schema-design
+
+context: |
+  ste-architecture-substrate must support multiple IaC technologies (CloudFormation,
+  Terraform, SAM, CDK) while providing a stable consumption interface. This ADR
+  defines the core artifact interface contract: universal fields ALL technologies
+  must provide, enabling technology-agnostic discovery and consumption.
+  
+  The core interface ensures consuming systems can discover and retrieve artifacts
+  without technology-specific code, while technology extensions (ADR-PS-0003) provide
+  IaC-specific fields.
+
+technology_stack:
+  - category: tooling
+    name: JSON Schema
+    version: Draft 2020-12
+    rationale: Core interface contract definition
+  - category: tooling
+    name: YAML
+    version: N/A
+    rationale: Artifact serialization format
+
+system_architecture:
+  components:
+    - id: COMP-0004
+      name: Core Seed Interface
+      type: contract
+      description: |
+        Universal fields for architecture seeds across all IaC technologies
+      responsibilities:
+        - Define technology-agnostic seed metadata
+        - Provide technology discriminator field
+        - Reference ADR bundle and mutation rules
+        - Support composition from building blocks
+      interfaces:
+        - Core fields: id, name, version, technology, domains, tags, adr_bundle, mutation_rules, composition, metadata
+        - Technology field (enum) enables filtering and extension resolution
+        
+    - id: COMP-0005
+      name: Core Bundle Interface
+      type: contract
+      description: |
+        Universal fields for building block bundles across all IaC technologies
+      responsibilities:
+        - Define technology-agnostic bundle metadata
+        - Provide technology discriminator field
+        - Reference mutation rules and optional ADR context
+        - Support dependency declaration
+      interfaces:
+        - Core fields: id, name, version, technology, domains, tags, mutation_rules, dependencies, metadata
+        - Optional: adr_context_prose (guidance for ADR generation)
+        
+    - id: COMP-0006
+      name: Core Primitive Interface
+      type: contract
+      description: |
+        Universal fields for primitive blocks across all IaC technologies
+      responsibilities:
+        - Define minimal primitive metadata
+        - Provide technology discriminator field
+      interfaces:
+        - Core fields: id, name, version, technology, metadata (minimal)
+        - No ADR context, no mutation rules
+
+  relationships:
+    - from: COMP-0004
+      to: COMP-0005
+      type: composes
+      description: Seeds compose building blocks via composition field
+      
+    - from: COMP-0005
+      to: COMP-0006
+      type: may_use
+      description: Bundles may reference primitives for low-level construction
+
+  technology_discriminator:
+    field: technology
+    type: enum
+    values:
+      - cloudformation
+      - terraform
+      - sam
+      - cdk
+    purpose: |
+      Enables technology filtering during discovery and directs consuming systems
+      to appropriate extension namespace for technology-specific fields
+
+  interface_stability_guarantee: |
+    Core interface fields are stable across substrate versions. Adding new IaC
+    technologies (e.g., Pulumi, Crossplane) does not change core fields. Technology
+    enum may expand, but existing values remain stable.
+
+  structural_validity_requirement: |
+    All IaC artifacts referenced in extension namespaces MUST be structurally valid
+    according to their technology's schema. CloudFormation templates must be valid
+    CFN YAML. Terraform modules must be valid HCL. This enables deterministic 1:1
+    projection without correction.
+
+  alternatives_considered:
+    - name: Forced uniformity model
+      description: Single iac_templates field for all technologies
+      rejected_because: Impedance mismatch - different technologies have fundamentally different structures
+      
+    - name: Capability-based model
+      description: Opaque artifacts with feature detection
+      rejected_because: Loses technology signal, harder to filter and route
+      
+    - name: Multi-implementation bundles
+      description: One seed with multiple IaC versions (CloudFormation + Terraform + CDK)
+      rejected_because: Assumes same logical seed works across technologies (often false)
+
+  rationale: |
+    Core + extension model selected for: flexibility (technologies innovate in their
+    namespace), stability (consumers depend on core fields only), clarity (explicit
+    universal vs technology-specific separation), no forced uniformity (each technology
+    owns its namespace), familiar pattern (Kubernetes CRDs, OpenAPI additionalProperties).
+
+system_boundaries:
+  - id: SYSBOUND-0002
+    name: Core Interface Contract Boundary
+    description: |
+      Defines technology-agnostic artifact fields shared across all IaC technologies.
+      Technology-specific fields live in extension namespaces outside core interface.
+    external_dependencies:
+      - JSON Schema for validation
+      - IaC technologies for extension namespace definitions
+
+usage_flow: |
+  1. Consumer reads substrate-index.yaml
+  2. Consumer filters artifacts by technology discriminator
+  3. Consumer reads core fields (id, name, version, etc.) from artifact
+  4. Consumer reads technology extension namespace (e.g., cloudformation: {...})
+  5. Consumer projects IaC structure from extension namespace (deterministic)
+  6. Consumer interprets intent from ADR context prose (interpretive)
+
+non_goals:
+  - Core interface does not define technology-specific fields (those go in ADR-PS-0003)
+  - Core interface does not validate artifacts (consumers own validation)

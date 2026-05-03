@@ -1,0 +1,87 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ste-architecture-substrate.local/schemas/building-block-bundle.schema.json",
+  "title": "Substrate building block bundle artifact (core)",
+  "description": "Technology-agnostic core fields for building block bundles. Combine with a technology extension using JSON Schema allOf.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["metadata", "mutation_rules"],
+  "properties": {
+    "schema_version": {
+      "type": "string"
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "version", "technology"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+"
+        },
+        "technology": {
+          "type": "string"
+        },
+        "domains": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "description": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "adr_bundle": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "adr_context_prose": {
+      "type": "string",
+      "description": "Optional path to non-authoritative ADR context markdown (ADR-PC-0008)."
+    },
+    "mutation_rules": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Relative path to mutation rules sidecar (required for bundles)."
+    },
+    "dependencies": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "cloudformation": {
+      "type": "object",
+      "description": "Technology-specific CloudFormation namespace; validate shape with cloudformation/bundle-extension.schema.json.",
+      "additionalProperties": true
+    }
+  }
+}

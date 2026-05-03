@@ -1,0 +1,45 @@
+schema_version: "1.0"
+type: project_metadata
+
+project:
+  name: "ste-architecture-substrate"
+  description: "Machine-first architecture seeds, building blocks, and mutation rules for STE"
+  type: library
+
+ownership:
+  team: "architecture-systems"
+  tech_lead: "@egallmann"
+
+repository:
+  url: "github.com/egallmann/ste-architecture-substrate"
+  primary_branch: "main"
+
+implementation_identifiers:
+  package_name: "ste-architecture-substrate"
+  module_path: ""
+
+automation:
+  auto_merge_allowed: false
+  requires_human_review: true
+  comfort_level: conservative
+
+integrations:
+  scm:
+    type: github
+    required_approvers: ["@egallmann"]
+
+compliance:
+  security_level: medium
+  data_classification: public
+  license: "Apache-2.0"
+
+architecture_documentation:
+  adr_directory: "adrs/"
+  manifest_path: "adrs/manifest.yaml"
+  architecture_namespace: "ste-architecture-substrate"
+
+integrations_ste:
+  consumed_by:
+    - adr-architecture-kit
+    - ste-runtime
+  authority: "adr-architecture-kit ADR-L-0006"

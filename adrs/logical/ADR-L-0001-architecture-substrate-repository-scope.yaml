@@ -1,0 +1,225 @@
+schema_version: '1.0'
+adr_type: logical
+id: ADR-L-0001
+title: Architecture Substrate Repository Scope
+status: proposed
+created_date: '2026-05-02'
+authors:
+- Erik Gallmann
+domains:
+- architecture
+- infrastructure-as-code
+- governance
+
+context: |
+  The STE ecosystem needs a machine-first repository of reusable architecture artifacts
+  that accelerate system design and reduce repeated architectural decision-making.
+  
+  Current state: Engineers and AI systems start from scratch for each architecture,
+  leading to repeated discovery, inconsistent designs, lossy reasoning, and slow iteration.
+  
+  Desired state: Architecture starts from prebuilt, structured, machine-readable artifacts
+  (seeds, building blocks, primitives) that encode both structure (IaC) and intent
+  (mutation rules, ADR context).
+  
+  This ADR defines the scope and boundaries of the ste-architecture-substrate repository
+  as the foundational layer from which architectures are formed.
+
+decisions:
+- id: DEC-0001
+  summary: |
+    ste-architecture-substrate is a storage and structuring system for architecture
+    artifacts, NOT a validation or enforcement framework.
+  rationale: |
+    Separation of concerns: substrate provides artifacts, consuming systems (adr-kit
+    extensions, conversation engines, ste-runtime) perform projection, interpretation,
+    validation, and enforcement. This preserves the Ulysses contract model where
+    constraints guide by default but can be overridden with explicit intent.
+
+- id: DEC-0002
+  summary: Core artifact types are seeds, building block bundles, and primitive blocks.
+  rationale: |
+    Seeds provide complete starting architectures, building blocks provide reusable
+    components, and primitive blocks provide low-level fallback constructs. This
+    three-tier model balances high-level acceleration (seeds) with granular composition
+    (blocks and primitives).
+
+- id: DEC-0003
+  summary: |
+    Substrate artifacts follow the Ulysses contract model: pre-committed intent,
+    normative but non-enforcing, compliance by default, deviation allowed, enforcement
+    external to substrate.
+  rationale: |
+    Architects and AI systems should be guided toward compliant designs by default,
+    but must retain the ability to deviate with explicit intent. Substrate encodes
+    normative guidance (mutation rules) without blocking override. External systems
+    (CI, CloudFormation hooks, SCPs) optionally enforce constraints.
+
+- id: DEC-0004
+  summary: |
+    Projection vs interpretation invariant: structure is deterministically projected,
+    intent is interpretively generated.
+  rationale: |
+    IaC structural elements (CloudFormation templates, Terraform modules) must be
+    reusable 1:1 without reinterpretation (deterministic projection). Architectural
+    reasoning (why this structure, what tradeoffs, which alternatives rejected) must
+    be generated based on system context (interpretive generation). This separation
+    enables reliable structure reuse while preserving context-specific reasoning.
+
+- id: DEC-0005
+  summary: |
+    Structural validity invariant: all IaC artifacts MUST be structurally valid
+    according to their technology's schema.
+  rationale: |
+    Valid IaC enables deterministic 1:1 projection into consuming systems without
+    correction. CloudFormation templates must conform to CFN schema, Terraform modules
+    must be valid HCL. Structural validity is a pre-condition for substrate artifacts,
+    not enforced by substrate at runtime.
+
+- id: DEC-0006
+  summary: Substrate does not perform validation, enforcement, or runtime execution.
+  rationale: |
+    Substrate is a storage and structuring layer. Validation (schema conformance,
+    constraint checking), enforcement (blocking non-compliant changes), and runtime
+    execution (deploying IaC, running governance rules) are responsibilities of
+    consuming systems. This maintains clear boundaries and prevents scope creep.
+
+- id: DEC-0007
+  summary: |
+    Alternatives considered and rejected: template library (no mutation rules/normative
+    guidance), policy engine (enforcement contradicts Ulysses contract), validation
+    framework (substrate provides structure, consumers validate).
+  rationale: |
+    Template library: insufficient - provides structure but no normative guidance
+    on evolution. Policy engine: wrong model - enforcement contradicts normative-but-overridable
+    Ulysses contract. Validation framework: wrong responsibility - substrate provides
+    artifacts, consuming systems validate. Repository model with guided artifacts
+    selected to balance structure provision with guidance without enforcement.
+
+capabilities:
+- id: CAP-0001
+  name: Artifact Storage
+  description: Store architecture seeds, building block bundles, and primitive blocks with associated metadata
+  
+- id: CAP-0002
+  name: Artifact Structuring
+  description: Define and maintain schemas for artifact types and discovery surfaces
+  
+- id: CAP-0003
+  name: Mutation Rule Definition
+  description: Encode machine-readable constraints on artifact evolution (immutable, mutable, conditional)
+
+architectural_boundaries:
+- id: BOUND-0001
+  name: Included Responsibilities
+  description: |
+    Artifact storage, artifact structuring, mutation rule definition, discovery
+    surface provision
+  rationale: |
+    These responsibilities define substrate's core value: providing structured, reusable
+    architecture artifacts with normative guidance
+
+- id: BOUND-0002
+  name: Excluded Responsibilities
+  description: |
+    Validation logic, enforcement behavior, runtime execution, policy decision-making,
+    projection logic (consuming systems own these)
+  rationale: |
+    Substrate is a storage layer, not an enforcement or execution layer; clear boundaries
+    prevent scope creep and maintain separation of concerns
+
+interaction_contracts:
+- id: CONTRACT-0001
+  description: |
+    Integration with STE ecosystem: substrate provides artifacts to adr-architecture-kit
+    extensions (project into ADR-PC), conversation engines (select and retrieve seeds/blocks),
+    and ste-runtime (may reference in workspace compilation)
+  parties:
+    - ste-architecture-substrate
+    - adr-architecture-kit
+    - conversation engines
+    - ste-runtime
+  protocol: File-based artifact retrieval with discovery bundles
+  guarantees: |
+    Artifact structure is deterministic and projection-ready. Discovery bundles
+    provide complete artifact metadata. IaC artifacts are structurally valid per
+    technology schema.
+
+- id: CONTRACT-0002
+  description: |
+    File-based consumption interface following STE conventions (conventional paths,
+    discovery bundles, manifest files, sibling repo resolution)
+  parties:
+    - ste-architecture-substrate
+    - consuming systems
+  protocol: Read-only file access to conventional directory structure
+  guarantees: |
+    Conventional paths are stable across versions. Discovery bundles are machine-readable
+    YAML. Sibling repo resolution follows STE workspace patterns.
+
+constraints:
+- id: CONST-0001
+  description: Substrate must not introduce validation logic
+  type: technical
+  rationale: Validation is the responsibility of consuming systems
+  
+- id: CONST-0002
+  description: Substrate must not introduce enforcement behavior
+  type: technical
+  rationale: Enforcement contradicts the Ulysses contract model
+  
+- id: CONST-0003
+  description: Substrate must not introduce runtime execution concerns
+  type: technical
+  rationale: Substrate is a storage layer, not an execution layer
+
+invariants:
+- id: INV-0001
+  statement: |
+    Projection vs interpretation: structure must be deterministically projectable,
+    intent must be interpretively generatable
+  scope: global
+  enforcement_level: must
+  enforcement_mechanism: design
+  verification_method: manual
+  rationale: Enables reliable structure reuse while preserving context-specific reasoning
+  compliance_frameworks: []
+  exceptions: []
+  
+- id: INV-0002
+  statement: |
+    Structural validity: all IaC artifacts MUST be structurally valid according
+    to their technology's schema (enables deterministic projection)
+  scope: global
+  enforcement_level: must
+  enforcement_mechanism: design
+  verification_method: manual
+  rationale: Valid IaC enables deterministic 1:1 projection without correction
+  compliance_frameworks: []
+  exceptions: []
+  
+- id: INV-0003
+  statement: |
+    Ulysses contract model: substrate artifacts are normative but non-enforcing;
+    compliance is default, deviation is allowed, enforcement is external
+  scope: global
+  enforcement_level: must
+  enforcement_mechanism: design
+  verification_method: manual
+  rationale: Guides toward compliance by default while allowing explicit override
+  compliance_frameworks: []
+  exceptions: []
+  
+- id: INV-0004
+  statement: Substrate is non-authoritative; ADR-PC generated from substrate artifacts is authoritative
+  scope: global
+  enforcement_level: must
+  enforcement_mechanism: design
+  verification_method: manual
+  rationale: Maintains clear authority model between substrate (source) and ADR-PC (authority)
+  compliance_frameworks: []
+  exceptions: []
+
+non_functional_requirements: []
+
+gaps: []

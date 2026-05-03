@@ -1,0 +1,224 @@
+schema_version: '1.0'
+adr_type: logical
+id: ADR-L-0005
+title: Corpus Maintenance and Discovery Sync
+status: proposed
+created_date: '2026-05-02'
+authors:
+- Erik Gallmann
+domains:
+- architecture
+- tooling
+- governance
+
+context: |
+  ADR-L-0004 (INV-0012) establishes that the discovery surface is derived and must
+  not be hand-authored. This creates an obligation: if the discovery surface cannot
+  be hand-edited, there must be a primary, repo-local capability to regenerate
+  and validate it from the authoritative corpus.
+
+  Without maintenance tooling, the corpus is difficult to extend. Adding a new
+  building block requires knowing exactly which discovery files to update and in what
+  format — a coordination burden that grows with the corpus size. For a fork-friendly
+  repo expected to be extended by downstream organizations, this friction is a
+  systemic barrier.
+
+  The workspace AGENTS.md contract guard rule requires that any repo committing
+  generated artifacts also provides a repo-local contract guard command. The
+  discovery surface (substrate-index.json, substrate-manifest.yaml, registries)
+  is a generated artifact. The contract guard obligation is therefore mandatory.
+
+  This ADR defines the corpus maintenance capability: what the tooling must do,
+  the invariants it enforces, and the behavioral contracts it provides to
+  contributors and automated systems.
+
+decisions:
+- id: DEC-0024
+  summary: |
+    The discovery surface MUST be generated from corpus metadata files.
+    Discovery files MUST NOT be hand-authored as primary artifacts.
+  rationale: |
+    Hand-authored discovery creates drift risk: a contributor adds a building block
+    but forgets to update three discovery files. Generated discovery eliminates the
+    the category of "corpus added, index stale" errors by making sync explicit and
+    automatable. The metadata.json files in each corpus artifact are the single
+    source of truth; the discovery surface is a projection of those files.
+
+- id: DEC-0025
+  summary: |
+    A corpus sync command MUST regenerate the complete discovery surface
+    (index, manifest, all registries) from a single invocation.
+  rationale: |
+    Partial regeneration (e.g., sync only the seeds registry) leaves the system
+    in an inconsistent intermediate state. A single sync guarantees full consistency
+    in one operation. The cost of regenerating the full surface is negligible
+    (filesystem traversal over a small corpus).
+
+- id: DEC-0026
+  summary: |
+    A corpus check command MUST verify bidirectional integrity between the
+    discovery index and the corpus filesystem, and MUST exit non-zero on drift.
+  rationale: |
+    Bidirectional: (1) every entry in the index must resolve to a real file on disk;
+    (2) every artifact on disk must appear in the index. One-directional checks
+    (index-to-disk only) miss the case where an artifact is added to corpus but
+    not yet synced. Non-zero exit enables integration with pre-push hooks and CI.
+
+- id: DEC-0027
+  summary: |
+    Corpus check MUST be wired as a repo contract guard: either a pre-push hook
+    or a CI gate that runs on every commit touching corpus/ or discovery/.
+  rationale: |
+    Matches the workspace AGENTS.md contract guard rule (generated artifacts require
+    a contract guard command). A pre-push hook provides local enforcement before
+    push; CI provides enforcement for pull requests and direct pushes. Both are
+    preferred; at minimum the hook must exist.
+
+- id: DEC-0028
+  summary: |
+    Corpus tooling MUST be executable without package installation: a standalone
+    Python script runnable with the repo's standard Python environment.
+  rationale: |
+    A fork-friendly repo cannot assume pip-installable tooling is pre-installed.
+    A standalone script in tools/ lowers the barrier for forked organizations and
+    aligns with the "no ceremony" ethos of the project. If the tool matures, it
+    can be promoted to a proper CLI; the standalone-first approach does not
+    preclude that.
+
+- id: DEC-0029
+  summary: |
+    Corpus tooling MUST NOT write to corpus/; it MUST only read corpus/ and
+    write discovery/.
+  rationale: |
+    The corpus artifacts (metadata.json, templates, mutation-rules.yaml) are the
+    authoritative source of truth. Tooling that modifies them would violate the
+    authority model defined in ADR-L-0002. Discovery is the only writable surface
+    for corpus tooling.
+
+capabilities:
+- id: CAP-0013
+  name: Corpus Sync
+  description: |
+    Regenerate the complete discovery surface (substrate-index.json,
+    substrate-manifest.yaml, discovery/registries/*.json) by walking
+    corpus/ and reading all metadata.json files.
+
+- id: CAP-0014
+  name: Corpus Validate
+  description: |
+    Validate all corpus metadata.json files against their respective JSON Schemas
+    (seed.schema.json, building-block-bundle.schema.json, primitive-block.schema.json)
+    and report violations with file path and field context.
+
+- id: CAP-0015
+  name: Corpus Contract Guard
+  description: |
+    Verify bidirectional integrity between corpus/ filesystem and discovery/substrate-index.json.
+    Exit non-zero on drift. Used as pre-push hook and CI gate.
+
+architectural_boundaries:
+- id: BOUND-0001
+  name: Included Responsibilities
+  description: |
+    Corpus traversal, metadata file reading, schema validation, discovery surface
+    generation, bidirectional integrity checking, contract guard execution.
+  rationale: |
+    These are the minimal responsibilities required to fulfill the maintenance
+    capability and the AGENTS.md contract guard obligation.
+
+- id: BOUND-0002
+  name: Excluded Responsibilities
+  description: |
+    Corpus artifact authoring, artifact deployment, schema evolution, ADR generation,
+    git operations (commit, push, tag).
+  rationale: |
+    Corpus authoring is a human/agent responsibility. Deployment is downstream.
+    Schema evolution is governed by ADR-L-0002. ADR generation is owned by
+    adr-architecture-kit. Git operations are out of scope for corpus tooling.
+
+interaction_contracts:
+- id: CONTRACT-0001
+  description: |
+    Corpus sync contract: given a valid corpus/ tree with well-formed metadata.json
+    files, corpus sync produces a complete, schema-valid discovery surface.
+  parties:
+    - contributor (human or agent)
+    - corpus_cli
+  protocol: |
+    Run corpus sync after any corpus/ mutation. Tool reads all metadata.json files,
+    validates structure, writes discovery files, exits 0 on success.
+  guarantees: |
+    Complete discovery surface written. All paths in output are relative to repo root.
+    Output is deterministic: same corpus state always produces the same discovery files.
+
+- id: CONTRACT-0002
+  description: |
+    Contract guard contract: corpus check is the repo-local guard command satisfying
+    the AGENTS.md requirement for generated artifact repositories.
+  parties:
+    - pre-push hook
+    - CI pipeline
+    - corpus_cli
+  protocol: |
+    Run corpus check before push or in CI. Tool verifies index ↔ filesystem
+    bijection, exits 0 if consistent, exits 1 if drift detected.
+  guarantees: |
+    Non-zero exit on any drift (orphan entries, missing files, unregistered artifacts).
+    Exit 0 only when index and corpus are fully consistent.
+
+constraints:
+- id: CONST-0001
+  description: Corpus tooling must not require network access
+  type: technical
+  rationale: Supports offline development and fork usage
+
+- id: CONST-0002
+  description: Corpus tooling must not write to corpus/
+  type: technical
+  rationale: ADR-L-0002 authority model — corpus artifacts are authoritative
+
+- id: CONST-0003
+  description: Corpus sync output must be deterministic
+  type: technical
+  rationale: Deterministic output enables reliable git diff review of discovery changes
+
+invariants:
+- id: INV-0014
+  statement: |
+    The discovery index MUST contain exactly the set of artifacts present in
+    corpus/ (bijection: no orphan index entries, no unregistered corpus artifacts).
+  scope: global
+  enforcement_level: must
+  enforcement_mechanism: test
+  verification_method: automated
+  rationale: Prevents stale index entries and ensures all corpus artifacts are discoverable
+  compliance_frameworks: []
+  exceptions: []
+
+- id: INV-0015
+  statement: |
+    Corpus tooling MUST NOT modify corpus artifact files (metadata.json, templates,
+    mutation-rules.yaml). Corpus tooling writes only to discovery/.
+  scope: global
+  enforcement_level: must
+  enforcement_mechanism: design
+  verification_method: manual
+  rationale: Maintains artifact authority model defined in ADR-L-0002
+  compliance_frameworks: []
+  exceptions: []
+
+- id: INV-0016
+  statement: |
+    Corpus sync output MUST be deterministic: identical corpus state MUST always
+    produce identical discovery surface files.
+  scope: global
+  enforcement_level: must
+  enforcement_mechanism: test
+  verification_method: automated
+  rationale: Deterministic sync enables reliable code review and CI diffing
+  compliance_frameworks: []
+  exceptions: []
+
+non_functional_requirements: []
+
+gaps: []

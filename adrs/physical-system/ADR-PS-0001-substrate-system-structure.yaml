@@ -1,0 +1,140 @@
+schema_version: '1.0'
+adr_type: physical-system
+id: ADR-PS-0001
+title: Substrate System Structure
+status: proposed
+created_date: '2026-05-02'
+authors:
+- Erik Gallmann
+implements_logical:
+- ADR-L-0001
+domains:
+- architecture
+- infrastructure-as-code
+
+context: |
+  ADR-L-0001 defines ste-architecture-substrate as a storage and structuring system
+  for architecture artifacts. This physical system ADR defines the concrete system
+  structure: components, their relationships, and how external systems integrate.
+
+technology_stack:
+  - category: infrastructure
+    name: File system
+    version: N/A
+    rationale: Substrate uses file-based storage and consumption
+  - category: tooling
+    name: JSON Schema
+    version: Draft 2020-12
+    rationale: Schema definition and validation
+  - category: tooling
+    name: YAML
+    version: N/A
+    rationale: Human and machine-readable artifact format
+
+system_architecture:
+  components:
+    - id: COMP-0001
+      name: Artifact Repository
+      type: storage
+      description: |
+        Stores architecture artifacts (seeds, building blocks, primitives) in conventional
+        directory structure: seeds/, building-blocks/, primitives/
+      responsibilities:
+        - Organize artifacts by type and technology
+        - Maintain artifact metadata files
+        - Store IaC templates and mutation rules
+      interfaces:
+        - File system read access for consuming systems
+      dependencies:
+        - File system
+        
+    - id: COMP-0002
+      name: Schema Registry
+      type: definition
+      description: |
+        Defines and maintains JSON Schema contracts for all artifact types
+      responsibilities:
+        - Define artifact structure schemas (seed, bundle, primitive)
+        - Define mutation rules schema
+        - Define discovery surface schemas
+        - Version schemas using semantic versioning
+      interfaces:
+        - JSON Schema files under schemas/ directory
+      dependencies:
+        - None (schemas are foundational)
+        
+    - id: COMP-0003
+      name: Discovery Surface
+      type: indexing
+      description: |
+        Provides machine-readable catalogs of available artifacts via substrate-index.yaml
+        and substrate-manifest.yaml
+      responsibilities:
+        - Generate substrate-index.yaml with registry paths
+        - Generate substrate-manifest.yaml with artifact summaries
+        - Generate technology-specific registries
+        - Enable efficient artifact discovery and filtering
+      interfaces:
+        - substrate-index.yaml (entrypoint)
+        - substrate-manifest.yaml (metadata)
+        - Registries (seeds-registry.yaml, building-blocks-registry.yaml, primitives-registry.yaml)
+      dependencies:
+        - Artifact Repository (source of truth)
+
+  relationships:
+    - from: COMP-0003
+      to: COMP-0001
+      type: reads
+      description: Discovery Surface derives catalogs from Artifact Repository
+      
+    - from: COMP-0001
+      to: COMP-0002
+      type: conforms_to
+      description: Artifacts conform to schemas defined in Schema Registry
+
+  external_interactions:
+    - system: adr-architecture-kit
+      interaction_type: consumes
+      description: |
+        adr-kit extensions read substrate artifacts and project into ADR-PC.
+        Structure is deterministically projected, intent is interpretively generated.
+      protocol: File-based artifact retrieval
+      
+    - system: conversation engines
+      interaction_type: queries
+      description: |
+        Engines query substrate-index for available seeds/blocks, retrieve artifacts
+        based on conversation context
+      protocol: Discovery bundle traversal with metadata filtering
+      
+    - system: ste-runtime
+      interaction_type: references
+      description: |
+        ste-runtime may reference substrate artifacts in workspace manifests (optional)
+      protocol: Sibling repo resolution or explicit path reference
+
+system_boundaries:
+  - id: SYSBOUND-0001
+    name: Substrate Storage Boundary
+    description: |
+      Encapsulates artifact storage, schema definition, and discovery surface provision.
+      External systems consume artifacts via file-based interfaces.
+    external_dependencies:
+      - File system for artifact storage
+      - External validators for schema conformance checks
+
+usage_flow: |
+  1. External system reads substrate-index.yaml (discovery entrypoint)
+  2. substrate-index provides paths to technology-specific registries
+  3. System reads appropriate registry (e.g., seeds-registry.yaml for CloudFormation seeds)
+  4. System filters artifacts by technology, domains, tags
+  5. System retrieves specific artifact by id from Artifact Repository
+  6. Artifact includes IaC templates, mutation rules, ADR bundle, metadata
+  7. Consuming system projects IaC structure (deterministic 1:1)
+  8. Consuming system interprets intent from ADR context prose and mutation rules
+
+non_goals:
+  - Substrate does not perform projection (consuming systems own this)
+  - Substrate does not validate artifacts at runtime
+  - Substrate does not enforce mutation rules
+  - Substrate does not provide HTTP APIs or runtime query interfaces

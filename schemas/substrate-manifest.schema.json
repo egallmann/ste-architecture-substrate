@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ste-architecture-substrate.local/schemas/substrate-manifest.schema.json",
+  "title": "Substrate discovery manifest (substrate-manifest.yaml serializes to JSON subset)",
+  "description": "Human-oriented discovery manifest produced alongside substrate-index.json (ADR-PC-0008). YAML on disk; this schema validates the JSON-compatible structure.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["version", "generated_at"],
+  "properties": {
+    "version": {
+      "type": "string"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "repository": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "seeds": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "bundles": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "primitives": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "statistics": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  }
+}
