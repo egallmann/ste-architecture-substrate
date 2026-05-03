@@ -104,7 +104,7 @@ Implementation (IaC / Code)
 At design time:
 
 1. **Select an Architecture Seed**
-   Choose a starting system that fits the problem, or let the conversation engine surface alternative candidate seeds, including patterns you may not be aware of, that could better match the discussion.
+   Choose a starting system that fits the problem, or let the conversation engine surface alternative candidate seeds, including patterns you may not be aware of that could better match the discussion.
 
 2. **Project Structure**
    Reuse IaC and components directly to eliminate redundant design work, compress design interrogation by not re-defining foundational elements from scratch, reduce token consumption, and accelerate convergence on a high-quality baseline.
@@ -184,7 +184,7 @@ This opens the door to:
 * agentic architectural evolution driven by falsifiable experimentation
 * direct mapping of telemetry back to design decisions
 * pattern discovery grounded in real system behavior
-* architecture patterns can be A/B tested in controlled lab environments for high-confidence candidate selection, and extended into self-healing systems where degradation or failure in production triggers mutation and evolution, with experimentation driven by observability data feeds, enabling automated, agent-driven refinement of architectures by treating design as a structured data problem, where decisions, constraints, and outcomes are continuously captured, evaluated, and iterated on without manual guesswork
+* architecture patterns can be A/B tested in controlled lab environments for high-confidence candidate selection and extended into self-healing systems where degradation or failure in production triggers mutation and evolution; experimentation driven by observability data feeds enables automated, agent-driven refinement of architectures by treating design as a structured data problem, where decisions, constraints, and outcomes are continuously captured, evaluated, and iterated on without manual guesswork
 
 ---
 
