@@ -1,0 +1,17 @@
+# ste-architecture-substrate .gitignore
+
+# Vendor / upstream fixture templates — local source material only, not tracked.
+# To populate: see fixtures/reference-architecture/*/README.md for source URLs.
+fixtures/reference-architecture/*/webapp.yaml
+fixtures/reference-architecture/**/*.yaml
+fixtures/reference-architecture/**/*.json
+
+# Keep README and example stubs tracked (used for schema validation tests)
+!fixtures/reference-architecture/**/README.md
+!fixtures/reference-architecture/**/*.example.json
+!fixtures/reference-architecture/**/*.example.yaml
+
+# Local developer scratch
+.scratch/
+*.local.yaml
+*.local.json

@@ -4,18 +4,1159 @@
 # generator_id: adr-compiler
 # generator_version: 1
 # hash_algorithm: sha256
-# source_hash: fb7c4487750861d55303c434d6503735ca96c8358b241c1e7415232cbc86dcc9
-# rendered_hash: 8085a57f6443ca049112807b1ff8b3da1371fe577bcb287a1d0b01135bc8f289
+# source_hash: a196d0b789a19fbdd61eb0e45d90a6b47ef76da74c942b72d913f2e71b90d450
+# rendered_hash: 2f0b08e96ce48f82555e9a013c6b637d5dba6c2c3c4d5bda1d90286b085cfd04
 
 schema_version: '1.1'
 type: entity_registry
 entities:
-- entity_id: DEC-0001
-  entity_type: decision
-  name: Describe the core decision.
+- entity_id: CAP-0001
+  entity_type: capability
+  name: Artifact Storage
   introduced_by: ADR-L-0001
   lifecycle_stage: active
   source_path: adrs/logical/ADR-L-0001-architecture-substrate-repository-scope.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: CAP-0002
+  entity_type: capability
+  name: Artifact Structuring
+  introduced_by: ADR-L-0001
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0001-architecture-substrate-repository-scope.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: CAP-0003
+  entity_type: capability
+  name: Mutation Rule Definition
+  introduced_by: ADR-L-0001
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0001-architecture-substrate-repository-scope.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: CAP-0004
+  entity_type: capability
+  name: Schema Definition
+  introduced_by: ADR-L-0002
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0002-artifact-authority-and-schema-ownership.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: CAP-0005
+  entity_type: capability
+  name: Schema Validation
+  introduced_by: ADR-L-0002
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0002-artifact-authority-and-schema-ownership.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: CAP-0006
+  entity_type: capability
+  name: Schema Evolution
+  introduced_by: ADR-L-0002
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0002-artifact-authority-and-schema-ownership.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: CAP-0007
+  entity_type: capability
+  name: Mutation Rule Definition
+  introduced_by: ADR-L-0003
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0003-mutation-rules-model.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: CAP-0008
+  entity_type: capability
+  name: Constraint Categorization
+  introduced_by: ADR-L-0003
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0003-mutation-rules-model.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: CAP-0009
+  entity_type: capability
+  name: AI Guidance
+  introduced_by: ADR-L-0003
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0003-mutation-rules-model.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: CAP-0010
+  entity_type: capability
+  name: File-Based Discovery
+  introduced_by: ADR-L-0004
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0004-substrate-consumption-and-discovery.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: CAP-0011
+  entity_type: capability
+  name: Conventional Paths
+  introduced_by: ADR-L-0004
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0004-substrate-consumption-and-discovery.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: CAP-0012
+  entity_type: capability
+  name: Technology Filtering
+  introduced_by: ADR-L-0004
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0004-substrate-consumption-and-discovery.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: CAP-0013
+  entity_type: capability
+  name: Corpus Sync
+  introduced_by: ADR-L-0005
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0005-corpus-maintenance-and-discovery-sync.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: CAP-0014
+  entity_type: capability
+  name: Corpus Validate
+  introduced_by: ADR-L-0005
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0005-corpus-maintenance-and-discovery-sync.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: CAP-0015
+  entity_type: capability
+  name: Corpus Contract Guard
+  introduced_by: ADR-L-0005
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0005-corpus-maintenance-and-discovery-sync.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: COMP-0001
+  entity_type: component
+  name: substrate CLI
+  introduced_by: ADR-PC-0001
+  lifecycle_stage: active
+  source_path: adrs/physical-component/ADR-PC-0001-substrate-tooling-cli.yaml
+  source_artifact_type: physical_component_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: COMP-0002
+  entity_type: component
+  name: CloudFormation Seed
+  introduced_by: ADR-PC-0002
+  lifecycle_stage: active
+  source_path: adrs/physical-component/ADR-PC-0002-cloudformation-seed-artifact-structure.yaml
+  source_artifact_type: physical_component_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: COMP-0003
+  entity_type: component
+  name: CloudFormation Bundle
+  introduced_by: ADR-PC-0003
+  lifecycle_stage: active
+  source_path: adrs/physical-component/ADR-PC-0003-cloudformation-building-block-bundle-structure.yaml
+  source_artifact_type: physical_component_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: COMP-0004
+  entity_type: component
+  name: CloudFormation Primitive
+  introduced_by: ADR-PC-0004
+  lifecycle_stage: active
+  source_path: adrs/physical-component/ADR-PC-0004-cloudformation-primitive-block-structure.yaml
+  source_artifact_type: physical_component_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: COMP-0005
+  entity_type: component
+  name: CloudFormation Mutation Rules
+  introduced_by: ADR-PC-0005
+  lifecycle_stage: active
+  source_path: adrs/physical-component/ADR-PC-0005-cloudformation-mutation-rules-schema.yaml
+  source_artifact_type: physical_component_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: COMP-0006
+  entity_type: component
+  name: CloudFormation Template Structure
+  introduced_by: ADR-PC-0006
+  lifecycle_stage: active
+  source_path: adrs/physical-component/ADR-PC-0006-cloudformation-template-structure-requirements.yaml
+  source_artifact_type: physical_component_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: COMP-0007
+  entity_type: component
+  name: Stack Policy Integration
+  introduced_by: ADR-PC-0007
+  lifecycle_stage: active
+  source_path: adrs/physical-component/ADR-PC-0007-cloudformation-stack-policy-integration.yaml
+  source_artifact_type: physical_component_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: COMP-0008
+  entity_type: component
+  name: Discovery Bundle Generator
+  introduced_by: ADR-PC-0008
+  lifecycle_stage: active
+  source_path: adrs/physical-component/ADR-PC-0008-substrate-discovery-bundle-generation.yaml
+  source_artifact_type: physical_component_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: COMP-0009
+  entity_type: component
+  name: corpus_cli
+  introduced_by: ADR-PC-0009
+  lifecycle_stage: active
+  source_path: adrs/physical-component/ADR-PC-0009-corpus-maintenance-cli-tooling.yaml
+  source_artifact_type: physical_component_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: DEC-0001
+  entity_type: decision
+  name: 'ste-architecture-substrate is a storage and structuring system for architecture
+
+    artifacts, NOT a validation or enforcement framework.
+
+    '
+  introduced_by: ADR-L-0001
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0001-architecture-substrate-repository-scope.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: DEC-0002
+  entity_type: decision
+  name: Core artifact types are seeds, building block bundles, and primitive blocks.
+  introduced_by: ADR-L-0001
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0001-architecture-substrate-repository-scope.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: DEC-0003
+  entity_type: decision
+  name: 'Substrate artifacts follow the Ulysses contract model: pre-committed intent,
+
+    normative but non-enforcing, compliance by default, deviation allowed, enforcement
+
+    external to substrate.
+
+    '
+  introduced_by: ADR-L-0001
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0001-architecture-substrate-repository-scope.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: DEC-0004
+  entity_type: decision
+  name: 'Projection vs interpretation invariant: structure is deterministically projected,
+
+    intent is interpretively generated.
+
+    '
+  introduced_by: ADR-L-0001
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0001-architecture-substrate-repository-scope.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: DEC-0005
+  entity_type: decision
+  name: 'Structural validity invariant: all IaC artifacts MUST be structurally valid
+
+    according to their technology''s schema.
+
+    '
+  introduced_by: ADR-L-0001
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0001-architecture-substrate-repository-scope.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: DEC-0006
+  entity_type: decision
+  name: Substrate does not perform validation, enforcement, or runtime execution.
+  introduced_by: ADR-L-0001
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0001-architecture-substrate-repository-scope.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: DEC-0007
+  entity_type: decision
+  name: 'Alternatives considered and rejected: template library (no mutation rules/normative
+
+    guidance), policy engine (enforcement contradicts Ulysses contract), validation
+
+    framework (substrate provides structure, consumers validate).
+
+    '
+  introduced_by: ADR-L-0001
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0001-architecture-substrate-repository-scope.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: DEC-0008
+  entity_type: decision
+  name: 'ste-architecture-substrate owns artifact structure schemas (seed, building
+    block,
+
+    primitive, mutation rules) and discovery surface schemas (substrate-index, substrate-manifest).
+
+    '
+  introduced_by: ADR-L-0002
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0002-artifact-authority-and-schema-ownership.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: DEC-0009
+  entity_type: decision
+  name: 'ste-spec owns normative cross-repo Architecture IR contracts if substrate
+    artifacts
+
+    appear in Architecture IR.
+
+    '
+  introduced_by: ADR-L-0002
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0002-artifact-authority-and-schema-ownership.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: DEC-0010
+  entity_type: decision
+  name: adr-architecture-kit owns ADR authoring schemas (ADR-L, ADR-PS, ADR-PC).
+  introduced_by: ADR-L-0002
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0002-artifact-authority-and-schema-ownership.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: DEC-0011
+  entity_type: decision
+  name: 'Schema evolution follows semantic versioning with explicit migration paths
+    for
+
+    breaking changes.
+
+    '
+  introduced_by: ADR-L-0002
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0002-artifact-authority-and-schema-ownership.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: DEC-0012
+  entity_type: decision
+  name: 'Contract guard and fixture sync patterns follow STE workspace conventions:
+    test
+
+    fixtures for sibling schema synchronization, optional CI parity checks, mirror
+
+    provenance documentation.
+
+    '
+  introduced_by: ADR-L-0002
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0002-artifact-authority-and-schema-ownership.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: DEC-0013
+  entity_type: decision
+  name: 'Mutation rules are explicit, machine-readable constraints on artifact evolution
+
+    encoded as sidecar YAML manifests.
+
+    '
+  introduced_by: ADR-L-0003
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0003-mutation-rules-model.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: DEC-0014
+  entity_type: decision
+  name: 'Mutation rule constraint taxonomy: immutable (must not change), mutable
+
+    (can change within bounds), conditional (mutability depends on context).
+
+    '
+  introduced_by: ADR-L-0003
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0003-mutation-rules-model.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: DEC-0015
+  entity_type: decision
+  name: 'AI guidance model: mutation rules maximize compliance by default, do not
+    enforce
+
+    locally, enforcement is external to substrate.
+
+    '
+  introduced_by: ADR-L-0003
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0003-mutation-rules-model.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: DEC-0016
+  entity_type: decision
+  name: 'Mutation rules are technology-specific due to addressing model differences
+    (CloudFormation
+
+    logical IDs, Terraform resource addresses, CDK construct paths).
+
+    '
+  introduced_by: ADR-L-0003
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0003-mutation-rules-model.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: DEC-0017
+  entity_type: decision
+  name: 'Mutation rules relate to operational controls (stack policies, SCPs, hooks)
+
+    but do not replace them.
+
+    '
+  introduced_by: ADR-L-0003
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0003-mutation-rules-model.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: DEC-0018
+  entity_type: decision
+  name: 'Alternatives considered: template metadata blocks (easy drift), Guard/OPA
+    only
+
+    (not YAML, harder AI consumption), JSON Schema constraints (insufficient semantics),
+
+    stack policy as source (operational, not authoring guidance). Sidecar YAML selected
+
+    for machine-readability, AI-friendliness, and technology-specific addressing.
+
+    '
+  introduced_by: ADR-L-0003
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0003-mutation-rules-model.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: DEC-0019
+  entity_type: decision
+  name: 'Substrate uses file-based consumption interface following STE conventions:
+    conventional
+
+    directory paths, discovery bundles, manifest files, sibling repo resolution.
+
+    '
+  introduced_by: ADR-L-0004
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0004-substrate-consumption-and-discovery.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: DEC-0020
+  entity_type: decision
+  name: 'Discovery mechanism: substrate-index.yaml (entrypoint), substrate-manifest.yaml
+
+    (metadata), registries (artifacts by type).
+
+    '
+  introduced_by: ADR-L-0004
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0004-substrate-consumption-and-discovery.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: DEC-0021
+  entity_type: decision
+  name: 'Artifact resolution: consumers read from conventional paths (seeds/, building-blocks/,
+
+    primitives/) via substrate-index references, with optional sibling repo resolution
+
+    for cross-repo integration.
+
+    '
+  introduced_by: ADR-L-0004
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0004-substrate-consumption-and-discovery.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: DEC-0022
+  entity_type: decision
+  name: 'Integration model: substrate provides artifacts, consuming systems perform
+    projection,
+
+    interpretation, validation, and enforcement.
+
+    '
+  introduced_by: ADR-L-0004
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0004-substrate-consumption-and-discovery.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: DEC-0023
+  entity_type: decision
+  name: Substrate does not provide HTTP API, service endpoints, or runtime query interfaces.
+  introduced_by: ADR-L-0004
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0004-substrate-consumption-and-discovery.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: DEC-0024
+  entity_type: decision
+  name: 'The discovery surface MUST be generated from corpus metadata files.
+
+    Discovery files MUST NOT be hand-authored as primary artifacts.
+
+    '
+  introduced_by: ADR-L-0005
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0005-corpus-maintenance-and-discovery-sync.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: DEC-0025
+  entity_type: decision
+  name: 'A corpus sync command MUST regenerate the complete discovery surface
+
+    (index, manifest, all registries) from a single invocation.
+
+    '
+  introduced_by: ADR-L-0005
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0005-corpus-maintenance-and-discovery-sync.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: DEC-0026
+  entity_type: decision
+  name: 'A corpus check command MUST verify bidirectional integrity between the
+
+    discovery index and the corpus filesystem, and MUST exit non-zero on drift.
+
+    '
+  introduced_by: ADR-L-0005
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0005-corpus-maintenance-and-discovery-sync.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: DEC-0027
+  entity_type: decision
+  name: 'Corpus check MUST be wired as a repo contract guard: either a pre-push hook
+
+    or a CI gate that runs on every commit touching corpus/ or discovery/.
+
+    '
+  introduced_by: ADR-L-0005
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0005-corpus-maintenance-and-discovery-sync.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: DEC-0028
+  entity_type: decision
+  name: 'Corpus tooling MUST be executable without package installation: a standalone
+
+    Python script runnable with the repo''s standard Python environment.
+
+    '
+  introduced_by: ADR-L-0005
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0005-corpus-maintenance-and-discovery-sync.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: DEC-0029
+  entity_type: decision
+  name: 'Corpus tooling MUST NOT write to corpus/; it MUST only read corpus/ and
+
+    write discovery/.
+
+    '
+  introduced_by: ADR-L-0005
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0005-corpus-maintenance-and-discovery-sync.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: INV-0001
+  entity_type: invariant
+  name: INV-0001
+  introduced_by: ADR-L-0001
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0001-architecture-substrate-repository-scope.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: INV-0002
+  entity_type: invariant
+  name: INV-0002
+  introduced_by: ADR-L-0001
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0001-architecture-substrate-repository-scope.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: INV-0003
+  entity_type: invariant
+  name: INV-0003
+  introduced_by: ADR-L-0001
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0001-architecture-substrate-repository-scope.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: INV-0004
+  entity_type: invariant
+  name: INV-0004
+  introduced_by: ADR-L-0001
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0001-architecture-substrate-repository-scope.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: INV-0005
+  entity_type: invariant
+  name: INV-0005
+  introduced_by: ADR-L-0002
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0002-artifact-authority-and-schema-ownership.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: INV-0006
+  entity_type: invariant
+  name: INV-0006
+  introduced_by: ADR-L-0002
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0002-artifact-authority-and-schema-ownership.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: INV-0007
+  entity_type: invariant
+  name: INV-0007
+  introduced_by: ADR-L-0002
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0002-artifact-authority-and-schema-ownership.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: INV-0008
+  entity_type: invariant
+  name: INV-0008
+  introduced_by: ADR-L-0003
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0003-mutation-rules-model.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: INV-0009
+  entity_type: invariant
+  name: INV-0009
+  introduced_by: ADR-L-0003
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0003-mutation-rules-model.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: INV-0010
+  entity_type: invariant
+  name: INV-0010
+  introduced_by: ADR-L-0003
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0003-mutation-rules-model.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: INV-0011
+  entity_type: invariant
+  name: INV-0011
+  introduced_by: ADR-L-0004
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0004-substrate-consumption-and-discovery.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: INV-0012
+  entity_type: invariant
+  name: INV-0012
+  introduced_by: ADR-L-0004
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0004-substrate-consumption-and-discovery.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: INV-0013
+  entity_type: invariant
+  name: INV-0013
+  introduced_by: ADR-L-0004
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0004-substrate-consumption-and-discovery.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: INV-0014
+  entity_type: invariant
+  name: INV-0014
+  introduced_by: ADR-L-0005
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0005-corpus-maintenance-and-discovery-sync.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: INV-0015
+  entity_type: invariant
+  name: INV-0015
+  introduced_by: ADR-L-0005
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0005-corpus-maintenance-and-discovery-sync.yaml
+  source_artifact_type: logical_adr
+  domains: []
+  related_adrs: []
+  realized_by: []
+  relationships:
+    depends_on: []
+    implements: []
+    consumes: []
+    realizes: []
+- entity_id: INV-0016
+  entity_type: invariant
+  name: INV-0016
+  introduced_by: ADR-L-0005
+  lifecycle_stage: active
+  source_path: adrs/logical/ADR-L-0005-corpus-maintenance-and-discovery-sync.yaml
   source_artifact_type: logical_adr
   domains: []
   related_adrs: []

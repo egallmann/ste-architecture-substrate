@@ -1,0 +1,232 @@
+schema_version: '1.0'
+adr_type: logical
+id: ADR-L-0003
+title: Mutation Rules Model
+status: proposed
+created_date: '2026-05-02'
+authors:
+- Erik Gallmann
+domains:
+- architecture
+- governance
+- infrastructure-as-code
+
+context: |
+  Architecture artifacts (seeds, building blocks) encode not just structure (IaC templates)
+  but also intent about how those structures should evolve over time. Some resources
+  should never change (immutable), others can be modified within bounds (mutable),
+  and others have conditional mutability based on context (conditional).
+  
+  Mutation rules provide explicit, machine-readable constraints on artifact evolution
+  that guide AI decision-making and optionally feed external enforcement systems.
+  They embody the Ulysses contract model: normative guidance that maximizes compliance
+  by default while allowing explicit override.
+  
+  This ADR defines the mutation rules model, constraint taxonomy, encoding approach,
+  and relationship to operational enforcement controls.
+
+decisions:
+- id: DEC-0013
+  summary: |
+    Mutation rules are explicit, machine-readable constraints on artifact evolution
+    encoded as sidecar YAML manifests.
+  rationale: |
+    Explicit constraints reduce ambiguity and enable deterministic AI guidance.
+    Machine-readable format (YAML) is consumable by both AI systems and humans.
+    Sidecar manifests (separate from IaC) avoid coupling constraints to IaC syntax
+    and enable technology-agnostic logical rules with technology-specific addressing.
+
+- id: DEC-0014
+  summary: |
+    Mutation rule constraint taxonomy: immutable (must not change), mutable
+    (can change within bounds), conditional (mutability depends on context).
+  rationale: |
+    Three-tier taxonomy balances expressiveness with simplicity. Immutable captures
+    "never change this" (e.g., S3 bucket name in production). Mutable captures "change
+    allowed with bounds" (e.g., instance type from t3.micro to t3.small). Conditional
+    captures "mutability depends on environment/stage/feature-flag" (e.g., encryption
+    required in prod, optional in dev).
+
+- id: DEC-0015
+  summary: |
+    AI guidance model: mutation rules maximize compliance by default, do not enforce
+    locally, enforcement is external to substrate.
+  rationale: |
+    Substrate guides AI toward compliant architectures by providing explicit constraints.
+    AI should respect mutation rules by default but can override with explicit intent
+    (Ulysses contract). Enforcement (CI checks, CloudFormation hooks, SCPs) is the
+    responsibility of external systems, not substrate. This preserves the boundary
+    between guidance (substrate) and enforcement (operational controls).
+
+- id: DEC-0016
+  summary: |
+    Mutation rules are technology-specific due to addressing model differences (CloudFormation
+    logical IDs, Terraform resource addresses, CDK construct paths).
+  rationale: |
+    Different IaC technologies use different addressing models. CloudFormation uses
+    logical IDs and property paths (Resources.MyBucket.Properties.BucketName). Terraform
+    uses resource addresses (aws_s3_bucket.my_bucket.bucket). CDK uses construct
+    paths. Technology-specific mutation rules enable precise targeting while maintaining
+    technology-agnostic logical intent.
+
+- id: DEC-0017
+  summary: |
+    Mutation rules relate to operational controls (stack policies, SCPs, hooks)
+    but do not replace them.
+  rationale: |
+    Mutation rules are authoring-time guidance. Operational controls (CloudFormation
+    stack policies, AWS SCPs, CloudFormation hooks) are runtime enforcement. Both
+    serve complementary roles. Mutation rules guide design decisions early (shift-left),
+    operational controls enforce at deployment/runtime. Optional: mutation rules
+    can be compiled to operational controls (e.g., Guard rules, stack policies) by
+    external tooling.
+
+- id: DEC-0018
+  summary: |
+    Alternatives considered: template metadata blocks (easy drift), Guard/OPA only
+    (not YAML, harder AI consumption), JSON Schema constraints (insufficient semantics),
+    stack policy as source (operational, not authoring guidance). Sidecar YAML selected
+    for machine-readability, AI-friendliness, and technology-specific addressing.
+  rationale: |
+    Template metadata blocks: risk drifting from actual properties as templates evolve.
+    Guard/OPA rule packs: powerful but DSLs are harder for AI to consume than YAML.
+    JSON Schema: good for type/bounds but doesn't encode immutable vs mutable vs
+    conditional semantics. Stack policy as source of truth: operational enforcement,
+    not authoring guidance; different intent. Sidecar YAML manifest selected for
+    balance of machine-readability, AI-friendliness, explicit addressing, and clean
+    separation from IaC syntax.
+
+capabilities:
+- id: CAP-0007
+  name: Mutation Rule Definition
+  description: Define technology-specific mutation rules for IaC artifacts
+  
+- id: CAP-0008
+  name: Constraint Categorization
+  description: Categorize constraints as immutable, mutable, or conditional
+  
+- id: CAP-0009
+  name: AI Guidance
+  description: Provide machine-readable constraints that guide AI decision-making by default
+
+architectural_boundaries:
+- id: BOUND-0001
+  name: Included Responsibilities
+  description: |
+    Mutation rule definition, constraint taxonomy, encoding, AI guidance model
+  rationale: |
+    Substrate provides normative guidance through mutation rules; this is core to
+    the Ulysses contract model
+
+- id: BOUND-0002
+  name: Excluded Responsibilities
+  description: |
+    Mutation rule enforcement, validation of compliance, operational control implementation
+    (these are external to substrate)
+  rationale: |
+    Enforcement contradicts normative-but-overridable Ulysses contract; external
+    systems own enforcement to preserve clear boundaries
+
+interaction_contracts:
+- id: CONTRACT-0001
+  description: |
+    Mutation rules are sidecar YAML files (mutation-rules.yaml) co-located with
+    IaC artifacts
+  parties:
+    - ste-architecture-substrate
+    - AI systems
+  protocol: Sidecar YAML manifest with structured rule entries
+  guarantees: |
+    Mutation rules are valid YAML. Rules include target, constraint type, and rationale.
+    Files co-located with IaC artifacts they constrain.
+
+- id: CONTRACT-0002
+  description: |
+    Mutation rules reference IaC elements using technology-specific addressing (CloudFormation
+    logical IDs, Terraform addresses, CDK paths)
+  parties:
+    - ste-architecture-substrate
+    - IaC technologies
+  protocol: Technology-specific path syntax in target field
+  guarantees: |
+    Target paths conform to technology addressing model. Addressing is unambiguous
+    within artifact. Technology field identifies addressing syntax.
+
+- id: CONTRACT-0003
+  description: |
+    AI systems consume mutation rules to guide architecture decisions; violations
+    are warnings, not errors (unless external enforcement active)
+  parties:
+    - ste-architecture-substrate
+    - AI systems
+    - conversation engines
+  protocol: Machine-readable YAML parsed for constraint guidance
+  guarantees: |
+    Rules are normative guidance (Ulysses contract). Violations do not block AI
+    decision-making. Rationale explains intent behind each constraint.
+
+- id: CONTRACT-0004
+  description: |
+    Optional compilation to operational controls (Guard, OPA, stack policies) by
+    external tooling (out of substrate scope)
+  parties:
+    - ste-architecture-substrate
+    - external enforcement tooling
+  protocol: External compilation from mutation-rules.yaml to enforcement format
+  guarantees: |
+    Mutation rules are structured for compilation. Technology field guides enforcement
+    target selection. Substrate does not perform compilation itself.
+
+constraints:
+- id: CONST-0001
+  description: Substrate must not implement mutation rule enforcement logic
+  type: technical
+  rationale: Enforcement is external to substrate per Ulysses contract model
+  
+- id: CONST-0002
+  description: Substrate must not validate mutation rule compliance at runtime
+  type: technical
+  rationale: Validation is the responsibility of consuming systems
+  
+- id: CONST-0003
+  description: Mutation rules must not assume addressing model generalizes across IaC technologies
+  type: technical
+  rationale: Different IaC technologies use different addressing models
+
+invariants:
+- id: INV-0008
+  statement: |
+    Mutation rules are normative guidance (Ulysses contract), not blocking constraints
+  scope: global
+  enforcement_level: must
+  enforcement_mechanism: design
+  verification_method: manual
+  rationale: Maintains normative-but-overridable model
+  compliance_frameworks: []
+  exceptions: []
+  
+- id: INV-0009
+  statement: |
+    Mutation rules are technology-specific due to addressing model differences
+  scope: global
+  enforcement_level: must
+  enforcement_mechanism: design
+  verification_method: manual
+  rationale: Different IaC technologies use different addressing models
+  compliance_frameworks: []
+  exceptions: []
+  
+- id: INV-0010
+  statement: |
+    Mutation rule violations are guidance for AI, not errors (unless external enforcement active)
+  scope: global
+  enforcement_level: must
+  enforcement_mechanism: design
+  verification_method: manual
+  rationale: Preserves Ulysses contract model
+  compliance_frameworks: []
+  exceptions: []
+
+non_functional_requirements: []
+
+gaps: []

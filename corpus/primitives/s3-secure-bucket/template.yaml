@@ -1,0 +1,33 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Minimal secure S3 bucket — encryption, versioning, public access block.
+
+Parameters:
+  BucketName:
+    Type: String
+  EnableVersioning:
+    Type: String
+    AllowedValues: [Enabled, Suspended]
+    Default: Enabled
+
+Resources:
+  Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref BucketName
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      VersioningConfiguration:
+        Status: !Ref EnableVersioning
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+Outputs:
+  BucketName:
+    Value: !Ref Bucket
+  BucketArn:
+    Value: !GetAtt Bucket.Arn

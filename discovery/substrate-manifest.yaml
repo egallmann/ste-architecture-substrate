@@ -1,0 +1,102 @@
+building_blocks:
+- dependencies:
+  - static-site-delivery
+  domains:
+  - auth
+  - identity
+  id: cognito-auth
+  name: Cognito Authentication
+  path: corpus/building-blocks/cognito-auth
+  tags:
+  - cognito
+  - oauth2
+  - userpool
+  - hosted-ui
+  - authentication
+  technology: cloudformation
+  version: 1.0.0
+- dependencies:
+  - cognito-auth
+  domains:
+  - api
+  - serverless
+  - auth
+  id: serverless-api
+  name: Serverless REST API
+  path: corpus/building-blocks/serverless-api
+  tags:
+  - apigateway
+  - lambda
+  - cognito-authorizer
+  - dynamodb
+  - jwt
+  - proxy
+  technology: cloudformation
+  version: 1.0.0
+- domains:
+  - web
+  - cdn
+  - security
+  id: static-site-delivery
+  name: Static Site Delivery
+  path: corpus/building-blocks/static-site-delivery
+  tags:
+  - cloudfront
+  - s3
+  - waf
+  - oac
+  - static-hosting
+  - replication
+  technology: cloudformation
+  version: 1.0.0
+description: Architecture seeds, building block bundles, and primitives owned by ste-architecture-substrate.
+  Provides opinionated, governed CloudFormation patterns for use by agents, humans,
+  and downstream systems.
+discovery_index: discovery/substrate-index.json
+generated_at: '2026-05-02'
+name: STE Architecture Substrate
+primitives:
+- id: lambda-execution-role
+  name: Lambda Execution Role
+  path: corpus/primitives/lambda-execution-role
+  technology: cloudformation
+  version: 1.0.0
+- id: lambda-function
+  name: Lambda Function
+  path: corpus/primitives/lambda-function
+  technology: cloudformation
+  version: 1.0.0
+- id: s3-secure-bucket
+  name: Secure S3 Bucket
+  path: corpus/primitives/s3-secure-bucket
+  technology: cloudformation
+  version: 1.0.0
+schema_version: 1.0.0
+seeds:
+- composition:
+  - static-site-delivery
+  - serverless-api
+  - cognito-auth
+  domains:
+  - web
+  - serverless
+  - auth
+  - api
+  - data
+  id: reference-webapp
+  name: Reference Web Application
+  path: corpus/seeds/reference-webapp
+  tags:
+  - reference
+  - webapp
+  - cloudfront
+  - apigateway
+  - cognito
+  - lambda
+  - dynamodb
+  - waf
+  technology: cloudformation
+  version: 1.0.0
+source_repository: ste-architecture-substrate
+technologies_present:
+- cloudformation

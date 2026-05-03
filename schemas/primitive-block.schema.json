@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ste-architecture-substrate.local/schemas/primitive-block.schema.json",
+  "title": "Substrate primitive block artifact (core)",
+  "description": "Minimal technology-agnostic primitive. Combine with a technology extension using JSON Schema allOf.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["metadata"],
+  "properties": {
+    "schema_version": {
+      "type": "string"
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version", "technology"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+"
+        },
+        "technology": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "cloudformation": {
+      "type": "object",
+      "description": "Technology-specific CloudFormation namespace; validate shape with cloudformation/primitive-extension.schema.json.",
+      "additionalProperties": true
+    }
+  }
+}

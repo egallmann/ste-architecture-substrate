@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0.0",
+  "metadata": {
+    "id": "lambda-execution-role",
+    "name": "Lambda Execution Role",
+    "description": "IAM role with Lambda trust policy and AWSLambdaBasicExecutionRole. Append additional policies after creation.",
+    "version": "1.0.0",
+    "technology": "cloudformation"
+  },
+  "cloudformation": {
+    "construct": "template.yaml",
+    "construct_type": "resource"
+  }
+}

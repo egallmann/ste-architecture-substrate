@@ -1,0 +1,491 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Reference web application: CloudFront + S3 static hosting, WAFv2, API Gateway REST API,
+  Lambda handlers, DynamoDB, and Cognito authentication.
+  Derived from aws-cloudformation-templates Solutions/WebApp (Apache-2.0).
+  Substrate reference pattern — replace Lambda defaults before deploying.
+
+Parameters:
+  AppName:
+    Type: String
+    Description: Name prefix for all stack resources
+    AllowedPattern: ^[a-z0-9-]{3,40}$
+    ConstraintDescription: Lowercase alphanumeric and hyphens, 3-40 chars
+
+  Env:
+    Type: String
+    Description: Deployment environment
+    AllowedValues: [dev, staging, prod]
+    Default: dev
+
+  LambdaCodeS3Bucket:
+    Type: String
+    Description: S3 bucket containing Lambda deployment packages
+
+  LambdaCodeS3Key:
+    Type: String
+    Description: S3 object key for the API handler Lambda package
+
+  JwtLambdaCodeS3Key:
+    Type: String
+    Description: S3 object key for the JWT/auth handler Lambda package
+
+Resources:
+
+  # ─────────────────────────────────────────────
+  # Static delivery — WAF
+  # ─────────────────────────────────────────────
+  SiteWebACL:
+    Type: AWS::WAFv2::WebACL
+    Properties:
+      Name: !Sub ${AppName}-webacl
+      Scope: CLOUDFRONT
+      Description: WAF with AWS Managed Rules for CloudFront distribution
+      DefaultAction:
+        Allow: {}
+      VisibilityConfig:
+        SampledRequestsEnabled: true
+        CloudWatchMetricsEnabled: true
+        MetricName: !Sub ${AppName}-webacl
+      Tags:
+        - Key: AppName
+          Value: !Ref AppName
+        - Key: Env
+          Value: !Ref Env
+      Rules:
+        - Name: AWS-AWSManagedRulesCommonRuleSet
+          Priority: 0
+          OverrideAction:
+            None: {}
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: !Sub ${AppName}-amr-crs
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesCommonRuleSet
+
+  # ─────────────────────────────────────────────
+  # Static delivery — S3 content bucket + logs + replica
+  # ─────────────────────────────────────────────
+  SiteContentLogBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub ${AppName}-content-logs-${AWS::Region}-${AWS::AccountId}
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      ObjectLockEnabled: true
+      ObjectLockConfiguration:
+        ObjectLockEnabled: Enabled
+        Rule:
+          DefaultRetention:
+            Mode: COMPLIANCE
+            Years: 1
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Enabled
+
+  SiteContentReplicaBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub ${AppName}-content-replica-${AWS::Region}-${AWS::AccountId}
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Enabled
+
+  SiteContentReplicationRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: s3.amazonaws.com
+            Action: sts:AssumeRole
+      Path: /
+
+  SiteContentReplicationPolicy:
+    Type: AWS::IAM::RolePolicy
+    Properties:
+      RoleName: !Ref SiteContentReplicationRole
+      PolicyName: content-replication
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action: [s3:GetReplicationConfiguration, s3:ListBucket]
+            Resource: !Sub arn:${AWS::Partition}:s3:::${AppName}-content-${AWS::Region}-${AWS::AccountId}
+          - Effect: Allow
+            Action: [s3:GetObjectVersionForReplication, s3:GetObjectVersionAcl, s3:GetObjectVersionTagging]
+            Resource: !Sub arn:${AWS::Partition}:s3:::${AppName}-content-${AWS::Region}-${AWS::AccountId}/*
+          - Effect: Allow
+            Action: [s3:ReplicateObject, s3:ReplicateDelete, s3:ReplicationTags]
+            Resource: !Sub arn:${AWS::Partition}:s3:::${AppName}-content-replica-${AWS::Region}-${AWS::AccountId}/*
+
+  SiteContentBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub ${AppName}-content-${AWS::Region}-${AWS::AccountId}
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      LoggingConfiguration:
+        DestinationBucketName: !Ref SiteContentLogBucket
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      ReplicationConfiguration:
+        Role: !GetAtt SiteContentReplicationRole.Arn
+        Rules:
+          - Status: Enabled
+            Destination:
+              Bucket: !GetAtt SiteContentReplicaBucket.Arn
+      VersioningConfiguration:
+        Status: Enabled
+
+  SiteContentBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref SiteContentBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowCloudFrontOAC
+            Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: s3:GetObject
+            Resource: !Sub arn:${AWS::Partition}:s3:::${AppName}-content-${AWS::Region}-${AWS::AccountId}/*
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub arn:${AWS::Partition}:cloudfront::${AWS::AccountId}:distribution/${SiteDistribution.Id}
+          - Sid: DenyInsecureTransport
+            Effect: Deny
+            Principal:
+              AWS: '*'
+            Action: s3:*
+            Resource:
+              - !Sub arn:${AWS::Partition}:s3:::${AppName}-content-${AWS::Region}-${AWS::AccountId}
+              - !Sub arn:${AWS::Partition}:s3:::${AppName}-content-${AWS::Region}-${AWS::AccountId}/*
+            Condition:
+              Bool:
+                aws:SecureTransport: false
+
+  # ─────────────────────────────────────────────
+  # Static delivery — CloudFront
+  # ─────────────────────────────────────────────
+  SiteOriginAccessControl:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: !Sub ${AppName}-oac
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+
+  SiteDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Comment: !Sub ${AppName} reference webapp (${Env})
+        Enabled: true
+        DefaultRootObject: index.html
+        HttpVersion: http2
+        IPV6Enabled: true
+        WebACLId: !GetAtt SiteWebACL.Arn
+        Origins:
+          - Id: !Sub ${AppName}-s3-origin
+            DomainName: !GetAtt SiteContentBucket.RegionalDomainName
+            OriginAccessControlId: !GetAtt SiteOriginAccessControl.Id
+            S3OriginConfig:
+              OriginAccessIdentity: ''
+        DefaultCacheBehavior:
+          TargetOriginId: !Sub ${AppName}-s3-origin
+          ViewerProtocolPolicy: redirect-to-https
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
+          Compress: true
+        ViewerCertificate:
+          CloudFrontDefaultCertificate: true
+
+  # ─────────────────────────────────────────────
+  # Cognito authentication
+  # ─────────────────────────────────────────────
+  CognitoUserPool:
+    Type: AWS::Cognito::UserPool
+    DependsOn: SiteDistribution
+    Properties:
+      UserPoolName: !Sub ${AppName}-users
+      AdminCreateUserConfig:
+        AllowAdminCreateUserOnly: true
+      AutoVerifiedAttributes: [email]
+      Schema:
+        - Name: email
+          Required: true
+        - Name: given_name
+          Required: true
+        - Name: family_name
+          Required: true
+
+  CognitoUserPoolDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties:
+      Domain: !Sub ${AppName}-${Env}
+      UserPoolId: !Ref CognitoUserPool
+
+  CognitoUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: !Sub ${AppName}-client
+      UserPoolId: !Ref CognitoUserPool
+      GenerateSecret: false
+      CallbackURLs:
+        - !Sub https://${SiteDistribution.DomainName}/index.html
+      AllowedOAuthFlows: [code]
+      AllowedOAuthFlowsUserPoolClient: true
+      AllowedOAuthScopes: [phone, email, openid]
+      SupportedIdentityProviders: [COGNITO]
+
+  # ─────────────────────────────────────────────
+  # Data — DynamoDB
+  # ─────────────────────────────────────────────
+  AppTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub ${AppName}-data
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+
+  # ─────────────────────────────────────────────
+  # API — Lambda handlers
+  # ─────────────────────────────────────────────
+  ApiHandlerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  ApiHandlerPolicy:
+    Type: AWS::IAM::RolePolicy
+    Properties:
+      RoleName: !Ref ApiHandlerRole
+      PolicyName: dynamo-access
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - dynamodb:BatchGetItem
+              - dynamodb:GetItem
+              - dynamodb:Query
+              - dynamodb:Scan
+              - dynamodb:BatchWriteItem
+              - dynamodb:PutItem
+              - dynamodb:UpdateItem
+            Resource: !GetAtt AppTable.Arn
+
+  ApiHandlerFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub ${AppName}-api-handler
+      Handler: bootstrap
+      Runtime: provided.al2023
+      Role: !GetAtt ApiHandlerRole.Arn
+      Code:
+        S3Bucket: !Ref LambdaCodeS3Bucket
+        S3Key: !Ref LambdaCodeS3Key
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref AppTable
+
+  JwtHandlerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  JwtHandlerFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub ${AppName}-jwt-handler
+      Handler: bootstrap
+      Runtime: provided.al2023
+      Role: !GetAtt JwtHandlerRole.Arn
+      Code:
+        S3Bucket: !Ref LambdaCodeS3Bucket
+        S3Key: !Ref JwtLambdaCodeS3Key
+      Environment:
+        Variables:
+          COGNITO_REGION: !Ref AWS::Region
+          COGNITO_POOL_ID: !Ref CognitoUserPool
+          COGNITO_APP_CLIENT_ID: !Ref CognitoUserPoolClient
+          COGNITO_DOMAIN_PREFIX: !Sub ${AppName}-${Env}
+          COGNITO_REDIRECT_URI: !Sub https://${SiteDistribution.DomainName}/index.html
+
+  # ─────────────────────────────────────────────
+  # API — REST API + authorizer
+  # ─────────────────────────────────────────────
+  RestApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: !Sub ${AppName}-api
+
+  RestApiAuthorizer:
+    Type: AWS::ApiGateway::Authorizer
+    Properties:
+      Name: CognitoAuthorizer
+      RestApiId: !Ref RestApi
+      Type: COGNITO_USER_POOLS
+      IdentitySource: method.request.header.authorization
+      ProviderARNs:
+        - !GetAtt CognitoUserPool.Arn
+
+  ApiResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref RestApi
+      ParentId: !GetAtt RestApi.RootResourceId
+      PathPart: api
+
+  JwtResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref RestApi
+      ParentId: !GetAtt RestApi.RootResourceId
+      PathPart: jwt
+
+  ApiGetMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref RestApi
+      ResourceId: !Ref ApiResource
+      HttpMethod: GET
+      AuthorizationType: COGNITO_USER_POOLS
+      AuthorizerId: !Ref RestApiAuthorizer
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ApiHandlerFunction.Arn}/invocations
+
+  ApiOptionsMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref RestApi
+      ResourceId: !Ref ApiResource
+      HttpMethod: OPTIONS
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ApiHandlerFunction.Arn}/invocations
+
+  JwtGetMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref RestApi
+      ResourceId: !Ref JwtResource
+      HttpMethod: GET
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${JwtHandlerFunction.Arn}/invocations
+
+  JwtOptionsMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref RestApi
+      ResourceId: !Ref JwtResource
+      HttpMethod: OPTIONS
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${JwtHandlerFunction.Arn}/invocations
+
+  ApiHandlerPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt ApiHandlerFunction.Arn
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${RestApi}/*/*/*
+
+  JwtHandlerPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt JwtHandlerFunction.Arn
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${RestApi}/*/*/*
+
+  RestApiDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn: [ApiGetMethod, ApiOptionsMethod, JwtGetMethod, JwtOptionsMethod]
+    Properties:
+      RestApiId: !Ref RestApi
+
+  RestApiStage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      RestApiId: !Ref RestApi
+      DeploymentId: !Ref RestApiDeployment
+      StageName: !Ref Env
+
+Outputs:
+  SiteURL:
+    Description: CloudFront distribution URL
+    Value: !Sub https://${SiteDistribution.DomainName}
+
+  RestApiURL:
+    Description: API Gateway stage invoke URL
+    Value: !Sub https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/${RestApiStage}
+
+  AppClientId:
+    Description: Cognito app client ID
+    Value: !Ref CognitoUserPoolClient
+
+  CognitoDomain:
+    Description: Cognito hosted UI domain prefix
+    Value: !Sub ${AppName}-${Env}
+
+  ContentBucketName:
+    Description: S3 bucket for static site content
+    Value: !Ref SiteContentBucket

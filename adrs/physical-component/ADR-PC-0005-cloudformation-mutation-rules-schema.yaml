@@ -1,0 +1,264 @@
+schema_version: '1.0'
+adr_type: physical-component
+id: ADR-PC-0005
+title: CloudFormation Mutation Rules Schema
+status: proposed
+created_date: '2026-05-02'
+authors:
+- Erik Gallmann
+implements_logical:
+- ADR-L-0003
+implements_system:
+- ADR-PS-0002
+domains:
+- cloudformation
+- governance
+context: |
+  CloudFormation mutation rules define composition constraints for building block bundles
+  using CloudFormation logical IDs as the addressing model. Rules specify which resources
+  and properties are immutable, append-only, or required during composition and updates.
+  
+  The logical ID addressing model leverages CloudFormation's native resource identification:
+  - Logical IDs uniquely identify resources within a template
+  - Dot notation accesses nested properties (LogicalId.Property.Nested)
+  - Wildcard patterns support resource families (MyResource.Tags.*)
+  
+  Mutation rules bridge architecture governance (ADR-L-0003) with CloudFormation's
+  declarative model, enabling safe composition without custom tooling.
+component_specifications:
+  - id: COMP-0005
+    name: CloudFormation Mutation Rules
+    type: library
+    responsibilities: |
+      - Define mutation rules using CloudFormation logical ID addressing
+      - Specify immutable and append-only patterns
+      - Document logical ID addressing model
+    generation_context:
+      purpose: Define CloudFormation mutation rules schema
+      key_responsibilities:
+        - Logical ID addressing
+        - Immutable and append-only rules
+        - Composition constraints
+      constraints:
+        - Must use CloudFormation logical IDs
+    interfaces:
+      - id: IFACE-0005
+        type: library_api
+        specification: |
+          mutation-rules.yaml Structure:
+          
+          ```yaml
+          # Resources/properties that cannot be modified after initial creation
+          immutable:
+            - LogicalId                    # Entire resource is immutable
+            - LogicalId.PropertyName       # Specific property is immutable
+            - LogicalId.Nested.Property    # Nested property is immutable
+            - LogicalId.*.Pattern          # Wildcard for multiple matches
+          
+          # Properties that can only have items added, never removed or modified
+          append_only:
+            - LogicalId.ArrayProperty
+            - LogicalId.Tags
+            - LogicalId.Rules
+          
+          # Resources that must exist and cannot be removed
+          required:
+            - LogicalId
+            - AnotherLogicalId
+          
+          # Optional metadata for documentation
+          metadata:
+            description: string
+            rationale: string
+            enforcement_level: advisory|required
+          ```
+          
+          CloudFormation Logical ID Addressing Examples:
+          
+          1. S3 Bucket Encryption (immutable):
+          ```yaml
+          Resources:
+            SecureBucket:
+              Type: AWS::S3::Bucket
+              Properties:
+                BucketEncryption:          # ← SecureBucket.BucketEncryption
+                  ServerSideEncryptionConfiguration:
+                    - SSEAlgorithm: AES256
+          
+          mutation-rules.yaml:
+            immutable:
+              - SecureBucket.BucketEncryption  # Cannot change encryption after creation
+          ```
+          
+          2. Security Group Rules (append-only):
+          ```yaml
+          Resources:
+            WebSecurityGroup:
+              Type: AWS::EC2::SecurityGroup
+              Properties:
+                SecurityGroupIngress:      # ← WebSecurityGroup.SecurityGroupIngress
+                  - IpProtocol: tcp
+                    FromPort: 443
+                    ToPort: 443
+                    CidrIp: 0.0.0.0/0
+          
+          mutation-rules.yaml:
+            append_only:
+              - WebSecurityGroup.SecurityGroupIngress  # Can add rules, cannot modify/remove
+          ```
+          
+          3. IAM Role with Required Policies (immutable + required):
+          ```yaml
+          Resources:
+            LambdaExecutionRole:
+              Type: AWS::IAM::Role
+              Properties:
+                AssumeRolePolicyDocument:  # ← LambdaExecutionRole.AssumeRolePolicyDocument
+                  Version: '2012-10-17'
+                  Statement:
+                    - Effect: Allow
+                      Principal:
+                        Service: lambda.amazonaws.com
+                      Action: sts:AssumeRole
+                ManagedPolicyArns:         # ← LambdaExecutionRole.ManagedPolicyArns
+                  - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+          
+          mutation-rules.yaml:
+            required:
+              - LambdaExecutionRole  # Role must exist
+            immutable:
+              - LambdaExecutionRole.AssumeRolePolicyDocument  # Trust policy immutable
+            append_only:
+              - LambdaExecutionRole.ManagedPolicyArns  # Can add policies, cannot remove
+          ```
+          
+          4. Wildcard Patterns for Tag Policies:
+          ```yaml
+          Resources:
+            MyResource:
+              Type: AWS::EC2::Instance
+              Properties:
+                Tags:
+                  - Key: Environment
+                    Value: Production
+                  - Key: CostCenter
+                    Value: Engineering
+          
+          mutation-rules.yaml:
+            immutable:
+              - MyResource.Tags.*.Key    # Tag keys are immutable
+            append_only:
+              - MyResource.Tags          # Can add tags, cannot remove
+          ```
+          
+          5. Complete Example: Secure VPC Subnet
+          ```yaml
+          # template.yaml
+          Resources:
+            PrivateSubnet:
+              Type: AWS::EC2::Subnet
+              Properties:
+                VpcId: !Ref VPC
+                CidrBlock: 10.0.1.0/24
+                AvailabilityZone: !Select [0, !GetAZs '']
+                MapPublicIpOnLaunch: false
+                Tags:
+                  - Key: Name
+                    Value: Private-Subnet-A
+                  - Key: Tier
+                    Value: Private
+            
+            PrivateRouteTable:
+              Type: AWS::EC2::RouteTable
+              Properties:
+                VpcId: !Ref VPC
+                Tags:
+                  - Key: Name
+                    Value: Private-RT
+            
+            SubnetRouteTableAssociation:
+              Type: AWS::EC2::SubnetRouteTableAssociation
+              Properties:
+                SubnetId: !Ref PrivateSubnet
+                RouteTableId: !Ref PrivateRouteTable
+          
+          # mutation-rules.yaml
+          immutable:
+            - PrivateSubnet.CidrBlock              # CIDR cannot change
+            - PrivateSubnet.AvailabilityZone       # AZ cannot change
+            - PrivateSubnet.MapPublicIpOnLaunch    # Public IP mapping immutable
+            - SubnetRouteTableAssociation          # Association immutable
+          
+          append_only:
+            - PrivateSubnet.Tags                   # Can add tags
+            - PrivateRouteTable.Tags               # Can add tags
+          
+          required:
+            - PrivateSubnet                        # Subnet must exist
+            - PrivateRouteTable                    # Route table must exist
+            - SubnetRouteTableAssociation          # Association must exist
+          
+          metadata:
+            description: Private subnet with immutable networking configuration
+            rationale: Prevents accidental network reconfiguration that could break routing
+            enforcement_level: required
+          ```
+          
+          Addressing Model Rules:
+          - Logical IDs are case-sensitive and must match template exactly
+          - Dot notation follows CloudFormation property hierarchy
+          - Array indices not supported (use append_only for array properties)
+          - Wildcards (*) match one path segment only
+          - Intrinsic functions (!Ref, !GetAtt) not evaluated in rules
+    implementation_identifiers:
+      module_path: schemas/mutation-rules.schema.json
+    implementation_requirements:
+      error_handling:
+        strategy: Schema validation errors
+      observability:
+        logging:
+          level: info
+          structured: false
+        metrics:
+          - name: mutation_rule_validations_total
+            type: counter
+      testing_requirements:
+        unit_test_coverage: '>= 80%'
+technology_stack:
+  - category: infrastructure
+    name: AWS CloudFormation
+    version: N/A
+    rationale: Target IaC technology
+deployment_model:
+  storage: Co-located as mutation-rules.yaml
+system_boundaries:
+  - id: COMPBOUND-0005
+    name: Mutation Rules Boundary
+    description: CloudFormation mutation constraints
+    external_dependencies:
+      - CloudFormation logical ID model
+implementation_decisions:
+  - id: IMPL-0007
+    summary: Use CloudFormation logical IDs as addressing model
+    rationale: |
+      Leverages CloudFormation's native resource identification rather than introducing
+      custom addressing scheme. Enables validation against template structure and aligns
+      with CloudFormation tooling (drift detection, change sets).
+  - id: IMPL-0008
+    summary: Support wildcard patterns for property families
+    rationale: |
+      Enables concise rules for repeated patterns (e.g., all tag keys immutable) without
+      enumerating every instance. Balances specificity with maintainability.
+constraints:
+  - id: CONST-0007
+    type: technical
+    description: Logical IDs in rules must reference resources that exist in the template
+    rationale: Prevents dangling references and enables validation at composition time
+  - id: CONST-0008
+    type: technical
+    description: Nested property paths must follow CloudFormation property hierarchy
+    rationale: Ensures rules can be verified against CloudFormation resource schemas
+non_goals:
+  - Does not enforce rules at composition time (consumer responsibility)
+  - Does not validate rule semantics against CloudFormation resource types
+  - Does not support conditional rules based on parameter values

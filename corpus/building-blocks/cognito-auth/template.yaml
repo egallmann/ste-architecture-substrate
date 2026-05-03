@@ -1,0 +1,76 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Cognito authentication: User Pool with email schema, hosted UI domain, and app client
+  configured for OAuth2 Authorization Code flow with PKCE.
+  Building block extracted from the reference-webapp substrate pattern.
+
+Parameters:
+  AppName:
+    Type: String
+    AllowedPattern: ^[a-z0-9-]{3,40}$
+
+  Env:
+    Type: String
+    AllowedValues: [dev, staging, prod]
+    Default: dev
+
+  CallbackUrl:
+    Type: String
+    Description: OAuth2 redirect URI — typically https://<CloudFront domain>/index.html
+
+Resources:
+
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Sub ${AppName}-users
+      AdminCreateUserConfig:
+        AllowAdminCreateUserOnly: true
+      AutoVerifiedAttributes: [email]
+      Schema:
+        - Name: email
+          Required: true
+        - Name: given_name
+          Required: true
+        - Name: family_name
+          Required: true
+
+  UserPoolDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties:
+      Domain: !Sub ${AppName}-${Env}
+      UserPoolId: !Ref UserPool
+
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: !Sub ${AppName}-client
+      UserPoolId: !Ref UserPool
+      GenerateSecret: false
+      CallbackURLs:
+        - !Ref CallbackUrl
+      AllowedOAuthFlows: [code]
+      AllowedOAuthFlowsUserPoolClient: true
+      AllowedOAuthScopes: [phone, email, openid]
+      SupportedIdentityProviders: [COGNITO]
+
+Outputs:
+  UserPoolId:
+    Value: !Ref UserPool
+    Export:
+      Name: !Sub ${AWS::StackName}-UserPoolId
+
+  UserPoolArn:
+    Value: !GetAtt UserPool.Arn
+    Export:
+      Name: !Sub ${AWS::StackName}-UserPoolArn
+
+  AppClientId:
+    Value: !Ref UserPoolClient
+    Export:
+      Name: !Sub ${AWS::StackName}-AppClientId
+
+  CognitoDomain:
+    Value: !Sub ${AppName}-${Env}
+    Export:
+      Name: !Sub ${AWS::StackName}-CognitoDomain

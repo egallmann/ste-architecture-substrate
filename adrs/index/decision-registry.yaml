@@ -3,8 +3,14 @@ type: normalized_entity_registry
 entities:
 - id: DEC-0001
   entity_type: decision
-  name: Describe the core decision.
-  summary: Explain why this decision is being made.
+  name: 'ste-architecture-substrate is a storage and structuring system for architecture
+
+    artifacts, NOT a validation or enforcement framework.
+
+    '
+  summary: 'Separation of concerns: substrate provides artifacts, consuming systems
+    (adr-kit extensions, conversation engines, ste-runtime) perform projection, interpretation,
+    validation, and enforcement. This preserves the Ulysses '
   canonical_source:
     source_type: logical_adr
     source_ref: ADR-L-0001#DEC-0001
@@ -38,6 +44,1299 @@ entities:
   provenance:
     source_type: logical_adr
     source_ref: ADR-L-0001#DEC-0001
+    extraction_phase: extract_decision
+    classification: explicit
+    generator: adr-architecture-index
+- id: DEC-0002
+  entity_type: decision
+  name: Core artifact types are seeds, building block bundles, and primitive blocks.
+  summary: 'Seeds provide complete starting architectures, building blocks provide
+    reusable components, and primitive blocks provide low-level fallback constructs.
+    This three-tier model balances high-level acceleration (seeds) with '
+  canonical_source:
+    source_type: logical_adr
+    source_ref: ADR-L-0001#DEC-0002
+    artifact_path: adrs/logical/ADR-L-0001-architecture-substrate-repository-scope.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-L-0001
+    related_invariants: []
+    enforces_invariants: []
+    enables_capabilities: []
+    governs_components: []
+    supersedes: []
+    refines: []
+  relationships:
+    declared_in:
+    - ADR-L-0001
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in: []
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: logical_adr
+    source_ref: ADR-L-0001#DEC-0002
+    extraction_phase: extract_decision
+    classification: explicit
+    generator: adr-architecture-index
+- id: DEC-0003
+  entity_type: decision
+  name: 'Substrate artifacts follow the Ulysses contract model: pre-committed intent,
+
+    normative but non-enforcing, compliance by default, deviation allowed, enforcement
+
+    external to substrate.
+
+    '
+  summary: Architects and AI systems should be guided toward compliant designs by
+    default, but must retain the ability to deviate with explicit intent. Substrate
+    encodes normative guidance (mutation rules) without blocking override
+  canonical_source:
+    source_type: logical_adr
+    source_ref: ADR-L-0001#DEC-0003
+    artifact_path: adrs/logical/ADR-L-0001-architecture-substrate-repository-scope.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-L-0001
+    related_invariants: []
+    enforces_invariants: []
+    enables_capabilities: []
+    governs_components: []
+    supersedes: []
+    refines: []
+  relationships:
+    declared_in:
+    - ADR-L-0001
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in: []
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: logical_adr
+    source_ref: ADR-L-0001#DEC-0003
+    extraction_phase: extract_decision
+    classification: explicit
+    generator: adr-architecture-index
+- id: DEC-0004
+  entity_type: decision
+  name: 'Projection vs interpretation invariant: structure is deterministically projected,
+
+    intent is interpretively generated.
+
+    '
+  summary: IaC structural elements (CloudFormation templates, Terraform modules) must
+    be reusable 1:1 without reinterpretation (deterministic projection). Architectural
+    reasoning (why this structure, what tradeoffs, which alternati
+  canonical_source:
+    source_type: logical_adr
+    source_ref: ADR-L-0001#DEC-0004
+    artifact_path: adrs/logical/ADR-L-0001-architecture-substrate-repository-scope.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-L-0001
+    related_invariants: []
+    enforces_invariants: []
+    enables_capabilities: []
+    governs_components: []
+    supersedes: []
+    refines: []
+  relationships:
+    declared_in:
+    - ADR-L-0001
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in: []
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: logical_adr
+    source_ref: ADR-L-0001#DEC-0004
+    extraction_phase: extract_decision
+    classification: explicit
+    generator: adr-architecture-index
+- id: DEC-0005
+  entity_type: decision
+  name: 'Structural validity invariant: all IaC artifacts MUST be structurally valid
+
+    according to their technology''s schema.
+
+    '
+  summary: Valid IaC enables deterministic 1:1 projection into consuming systems without
+    correction. CloudFormation templates must conform to CFN schema, Terraform modules
+    must be valid HCL. Structural validity is a pre-condition f
+  canonical_source:
+    source_type: logical_adr
+    source_ref: ADR-L-0001#DEC-0005
+    artifact_path: adrs/logical/ADR-L-0001-architecture-substrate-repository-scope.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-L-0001
+    related_invariants: []
+    enforces_invariants: []
+    enables_capabilities: []
+    governs_components: []
+    supersedes: []
+    refines: []
+  relationships:
+    declared_in:
+    - ADR-L-0001
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in: []
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: logical_adr
+    source_ref: ADR-L-0001#DEC-0005
+    extraction_phase: extract_decision
+    classification: explicit
+    generator: adr-architecture-index
+- id: DEC-0006
+  entity_type: decision
+  name: Substrate does not perform validation, enforcement, or runtime execution.
+  summary: Substrate is a storage and structuring layer. Validation (schema conformance,
+    constraint checking), enforcement (blocking non-compliant changes), and runtime
+    execution (deploying IaC, running governance rules) are respon
+  canonical_source:
+    source_type: logical_adr
+    source_ref: ADR-L-0001#DEC-0006
+    artifact_path: adrs/logical/ADR-L-0001-architecture-substrate-repository-scope.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-L-0001
+    related_invariants: []
+    enforces_invariants: []
+    enables_capabilities: []
+    governs_components: []
+    supersedes: []
+    refines: []
+  relationships:
+    declared_in:
+    - ADR-L-0001
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in: []
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: logical_adr
+    source_ref: ADR-L-0001#DEC-0006
+    extraction_phase: extract_decision
+    classification: explicit
+    generator: adr-architecture-index
+- id: DEC-0007
+  entity_type: decision
+  name: 'Alternatives considered and rejected: template library (no mutation rules/normative
+
+    guidance), policy engine (enforcement contradicts Ulysses contract), validation
+
+    framework (substrate provides structure, consumers validate).
+
+    '
+  summary: 'Template library: insufficient - provides structure but no normative guidance
+    on evolution. Policy engine: wrong model - enforcement contradicts normative-but-overridable
+    Ulysses contract. Validation framework: wrong res'
+  canonical_source:
+    source_type: logical_adr
+    source_ref: ADR-L-0001#DEC-0007
+    artifact_path: adrs/logical/ADR-L-0001-architecture-substrate-repository-scope.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-L-0001
+    related_invariants: []
+    enforces_invariants: []
+    enables_capabilities: []
+    governs_components: []
+    supersedes: []
+    refines: []
+  relationships:
+    declared_in:
+    - ADR-L-0001
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in: []
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: logical_adr
+    source_ref: ADR-L-0001#DEC-0007
+    extraction_phase: extract_decision
+    classification: explicit
+    generator: adr-architecture-index
+- id: DEC-0008
+  entity_type: decision
+  name: 'ste-architecture-substrate owns artifact structure schemas (seed, building
+    block,
+
+    primitive, mutation rules) and discovery surface schemas (substrate-index, substrate-manifest).
+
+    '
+  summary: 'These schemas define the internal structure of substrate artifacts and
+    how they are discovered. Substrate is the authority for its own artifact model.
+    Ownership enables substrate to evolve artifact schemas independently '
+  canonical_source:
+    source_type: logical_adr
+    source_ref: ADR-L-0002#DEC-0008
+    artifact_path: adrs/logical/ADR-L-0002-artifact-authority-and-schema-ownership.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-L-0002
+    related_invariants: []
+    enforces_invariants: []
+    enables_capabilities: []
+    governs_components: []
+    supersedes: []
+    refines: []
+  relationships:
+    declared_in:
+    - ADR-L-0002
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in: []
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: logical_adr
+    source_ref: ADR-L-0002#DEC-0008
+    extraction_phase: extract_decision
+    classification: explicit
+    generator: adr-architecture-index
+- id: DEC-0009
+  entity_type: decision
+  name: 'ste-spec owns normative cross-repo Architecture IR contracts if substrate
+    artifacts
+
+    appear in Architecture IR.
+
+    '
+  summary: 'Follows STE pattern: ste-spec is the single normative source for cross-repo
+    interchange contracts. If substrate artifacts are represented in Architecture
+    IR (e.g., for kernel admission or governance), the IR schema lives'
+  canonical_source:
+    source_type: logical_adr
+    source_ref: ADR-L-0002#DEC-0009
+    artifact_path: adrs/logical/ADR-L-0002-artifact-authority-and-schema-ownership.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-L-0002
+    related_invariants: []
+    enforces_invariants: []
+    enables_capabilities: []
+    governs_components: []
+    supersedes: []
+    refines: []
+  relationships:
+    declared_in:
+    - ADR-L-0002
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in: []
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: logical_adr
+    source_ref: ADR-L-0002#DEC-0009
+    extraction_phase: extract_decision
+    classification: explicit
+    generator: adr-architecture-index
+- id: DEC-0010
+  entity_type: decision
+  name: adr-architecture-kit owns ADR authoring schemas (ADR-L, ADR-PS, ADR-PC).
+  summary: 'Follows STE pattern: adr-kit defines stable authoring contracts for ADR
+    YAML. Substrate artifacts contain ADR bundles but do not redefine ADR schemas.
+    This maintains clear separation between artifact storage (substrate) '
+  canonical_source:
+    source_type: logical_adr
+    source_ref: ADR-L-0002#DEC-0010
+    artifact_path: adrs/logical/ADR-L-0002-artifact-authority-and-schema-ownership.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-L-0002
+    related_invariants: []
+    enforces_invariants: []
+    enables_capabilities: []
+    governs_components: []
+    supersedes: []
+    refines: []
+  relationships:
+    declared_in:
+    - ADR-L-0002
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in: []
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: logical_adr
+    source_ref: ADR-L-0002#DEC-0010
+    extraction_phase: extract_decision
+    classification: explicit
+    generator: adr-architecture-index
+- id: DEC-0011
+  entity_type: decision
+  name: 'Schema evolution follows semantic versioning with explicit migration paths
+    for
+
+    breaking changes.
+
+    '
+  summary: Substrate artifacts are long-lived and may be consumed by multiple systems
+    across versions. Semantic versioning (schema_version field) enables consuming
+    systems to detect compatibility. Breaking changes require migration
+  canonical_source:
+    source_type: logical_adr
+    source_ref: ADR-L-0002#DEC-0011
+    artifact_path: adrs/logical/ADR-L-0002-artifact-authority-and-schema-ownership.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-L-0002
+    related_invariants: []
+    enforces_invariants: []
+    enables_capabilities: []
+    governs_components: []
+    supersedes: []
+    refines: []
+  relationships:
+    declared_in:
+    - ADR-L-0002
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in: []
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: logical_adr
+    source_ref: ADR-L-0002#DEC-0011
+    extraction_phase: extract_decision
+    classification: explicit
+    generator: adr-architecture-index
+- id: DEC-0012
+  entity_type: decision
+  name: 'Contract guard and fixture sync patterns follow STE workspace conventions:
+    test
+
+    fixtures for sibling schema synchronization, optional CI parity checks, mirror
+
+    provenance documentation.
+
+    '
+  summary: 'When substrate mirrors external schemas (e.g., Architecture IR from ste-spec),
+    contract guards detect drift. Follows adr-architecture-kit pattern: byte-compare
+    tests when sibling checkout exists, advisory CI checks, MIRR'
+  canonical_source:
+    source_type: logical_adr
+    source_ref: ADR-L-0002#DEC-0012
+    artifact_path: adrs/logical/ADR-L-0002-artifact-authority-and-schema-ownership.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-L-0002
+    related_invariants: []
+    enforces_invariants: []
+    enables_capabilities: []
+    governs_components: []
+    supersedes: []
+    refines: []
+  relationships:
+    declared_in:
+    - ADR-L-0002
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in: []
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: logical_adr
+    source_ref: ADR-L-0002#DEC-0012
+    extraction_phase: extract_decision
+    classification: explicit
+    generator: adr-architecture-index
+- id: DEC-0013
+  entity_type: decision
+  name: 'Mutation rules are explicit, machine-readable constraints on artifact evolution
+
+    encoded as sidecar YAML manifests.
+
+    '
+  summary: 'Explicit constraints reduce ambiguity and enable deterministic AI guidance.
+    Machine-readable format (YAML) is consumable by both AI systems and humans. Sidecar
+    manifests (separate from IaC) avoid coupling constraints to '
+  canonical_source:
+    source_type: logical_adr
+    source_ref: ADR-L-0003#DEC-0013
+    artifact_path: adrs/logical/ADR-L-0003-mutation-rules-model.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-L-0003
+    related_invariants: []
+    enforces_invariants: []
+    enables_capabilities: []
+    governs_components: []
+    supersedes: []
+    refines: []
+  relationships:
+    declared_in:
+    - ADR-L-0003
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in: []
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: logical_adr
+    source_ref: ADR-L-0003#DEC-0013
+    extraction_phase: extract_decision
+    classification: explicit
+    generator: adr-architecture-index
+- id: DEC-0014
+  entity_type: decision
+  name: 'Mutation rule constraint taxonomy: immutable (must not change), mutable
+
+    (can change within bounds), conditional (mutability depends on context).
+
+    '
+  summary: Three-tier taxonomy balances expressiveness with simplicity. Immutable
+    captures "never change this" (e.g., S3 bucket name in production). Mutable captures
+    "change allowed with bounds" (e.g., instance type from t3.micro t
+  canonical_source:
+    source_type: logical_adr
+    source_ref: ADR-L-0003#DEC-0014
+    artifact_path: adrs/logical/ADR-L-0003-mutation-rules-model.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-L-0003
+    related_invariants: []
+    enforces_invariants: []
+    enables_capabilities: []
+    governs_components: []
+    supersedes: []
+    refines: []
+  relationships:
+    declared_in:
+    - ADR-L-0003
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in: []
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: logical_adr
+    source_ref: ADR-L-0003#DEC-0014
+    extraction_phase: extract_decision
+    classification: explicit
+    generator: adr-architecture-index
+- id: DEC-0015
+  entity_type: decision
+  name: 'AI guidance model: mutation rules maximize compliance by default, do not
+    enforce
+
+    locally, enforcement is external to substrate.
+
+    '
+  summary: Substrate guides AI toward compliant architectures by providing explicit
+    constraints. AI should respect mutation rules by default but can override with
+    explicit intent (Ulysses contract). Enforcement (CI checks, CloudFor
+  canonical_source:
+    source_type: logical_adr
+    source_ref: ADR-L-0003#DEC-0015
+    artifact_path: adrs/logical/ADR-L-0003-mutation-rules-model.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-L-0003
+    related_invariants: []
+    enforces_invariants: []
+    enables_capabilities: []
+    governs_components: []
+    supersedes: []
+    refines: []
+  relationships:
+    declared_in:
+    - ADR-L-0003
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in: []
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: logical_adr
+    source_ref: ADR-L-0003#DEC-0015
+    extraction_phase: extract_decision
+    classification: explicit
+    generator: adr-architecture-index
+- id: DEC-0016
+  entity_type: decision
+  name: 'Mutation rules are technology-specific due to addressing model differences
+    (CloudFormation
+
+    logical IDs, Terraform resource addresses, CDK construct paths).
+
+    '
+  summary: Different IaC technologies use different addressing models. CloudFormation
+    uses logical IDs and property paths (Resources.MyBucket.Properties.BucketName).
+    Terraform uses resource addresses (aws_s3_bucket.my_bucket.bucket
+  canonical_source:
+    source_type: logical_adr
+    source_ref: ADR-L-0003#DEC-0016
+    artifact_path: adrs/logical/ADR-L-0003-mutation-rules-model.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-L-0003
+    related_invariants: []
+    enforces_invariants: []
+    enables_capabilities: []
+    governs_components: []
+    supersedes: []
+    refines: []
+  relationships:
+    declared_in:
+    - ADR-L-0003
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in: []
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: logical_adr
+    source_ref: ADR-L-0003#DEC-0016
+    extraction_phase: extract_decision
+    classification: explicit
+    generator: adr-architecture-index
+- id: DEC-0017
+  entity_type: decision
+  name: 'Mutation rules relate to operational controls (stack policies, SCPs, hooks)
+
+    but do not replace them.
+
+    '
+  summary: Mutation rules are authoring-time guidance. Operational controls (CloudFormation
+    stack policies, AWS SCPs, CloudFormation hooks) are runtime enforcement. Both
+    serve complementary roles. Mutation rules guide design decisi
+  canonical_source:
+    source_type: logical_adr
+    source_ref: ADR-L-0003#DEC-0017
+    artifact_path: adrs/logical/ADR-L-0003-mutation-rules-model.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-L-0003
+    related_invariants: []
+    enforces_invariants: []
+    enables_capabilities: []
+    governs_components: []
+    supersedes: []
+    refines: []
+  relationships:
+    declared_in:
+    - ADR-L-0003
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in: []
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: logical_adr
+    source_ref: ADR-L-0003#DEC-0017
+    extraction_phase: extract_decision
+    classification: explicit
+    generator: adr-architecture-index
+- id: DEC-0018
+  entity_type: decision
+  name: 'Alternatives considered: template metadata blocks (easy drift), Guard/OPA
+    only
+
+    (not YAML, harder AI consumption), JSON Schema constraints (insufficient semantics),
+
+    stack policy as source (operational, not authoring guidance). Sidecar YAML selected
+
+    for machine-readability, AI-friendliness, and technology-specific addressing.
+
+    '
+  summary: 'Template metadata blocks: risk drifting from actual properties as templates
+    evolve. Guard/OPA rule packs: powerful but DSLs are harder for AI to consume than
+    YAML. JSON Schema: good for type/bounds but doesn''t encode imm'
+  canonical_source:
+    source_type: logical_adr
+    source_ref: ADR-L-0003#DEC-0018
+    artifact_path: adrs/logical/ADR-L-0003-mutation-rules-model.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-L-0003
+    related_invariants: []
+    enforces_invariants: []
+    enables_capabilities: []
+    governs_components: []
+    supersedes: []
+    refines: []
+  relationships:
+    declared_in:
+    - ADR-L-0003
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in: []
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: logical_adr
+    source_ref: ADR-L-0003#DEC-0018
+    extraction_phase: extract_decision
+    classification: explicit
+    generator: adr-architecture-index
+- id: DEC-0019
+  entity_type: decision
+  name: 'Substrate uses file-based consumption interface following STE conventions:
+    conventional
+
+    directory paths, discovery bundles, manifest files, sibling repo resolution.
+
+    '
+  summary: Consistency with STE ecosystem. ste-kernel, adr-kit, and ste-runtime use
+    file-based consumption (no HTTP APIs, no service dependencies). Conventional paths
+    enable predictable artifact location. Discovery bundles (substra
+  canonical_source:
+    source_type: logical_adr
+    source_ref: ADR-L-0004#DEC-0019
+    artifact_path: adrs/logical/ADR-L-0004-substrate-consumption-and-discovery.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-L-0004
+    related_invariants: []
+    enforces_invariants: []
+    enables_capabilities: []
+    governs_components: []
+    supersedes: []
+    refines: []
+  relationships:
+    declared_in:
+    - ADR-L-0004
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in: []
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: logical_adr
+    source_ref: ADR-L-0004#DEC-0019
+    extraction_phase: extract_decision
+    classification: explicit
+    generator: adr-architecture-index
+- id: DEC-0020
+  entity_type: decision
+  name: 'Discovery mechanism: substrate-index.yaml (entrypoint), substrate-manifest.yaml
+
+    (metadata), registries (artifacts by type).
+
+    '
+  summary: 'Follows STE pattern used in adr-kit and ste-runtime: index file as entrypoint,
+    manifest for generation metadata, registries for typed artifact lists. Index provides
+    stable paths to registries and generation info. Manifes'
+  canonical_source:
+    source_type: logical_adr
+    source_ref: ADR-L-0004#DEC-0020
+    artifact_path: adrs/logical/ADR-L-0004-substrate-consumption-and-discovery.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-L-0004
+    related_invariants: []
+    enforces_invariants: []
+    enables_capabilities: []
+    governs_components: []
+    supersedes: []
+    refines: []
+  relationships:
+    declared_in:
+    - ADR-L-0004
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in: []
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: logical_adr
+    source_ref: ADR-L-0004#DEC-0020
+    extraction_phase: extract_decision
+    classification: explicit
+    generator: adr-architecture-index
+- id: DEC-0021
+  entity_type: decision
+  name: 'Artifact resolution: consumers read from conventional paths (seeds/, building-blocks/,
+
+    primitives/) via substrate-index references, with optional sibling repo resolution
+
+    for cross-repo integration.
+
+    '
+  summary: Conventional paths reduce coordination overhead. Consumers know to look
+    in seeds/ for seeds, building-blocks/ for bundles. Substrate-index provides canonical
+    registry paths (handles layout variations). Sibling repo resol
+  canonical_source:
+    source_type: logical_adr
+    source_ref: ADR-L-0004#DEC-0021
+    artifact_path: adrs/logical/ADR-L-0004-substrate-consumption-and-discovery.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-L-0004
+    related_invariants: []
+    enforces_invariants: []
+    enables_capabilities: []
+    governs_components: []
+    supersedes: []
+    refines: []
+  relationships:
+    declared_in:
+    - ADR-L-0004
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in: []
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: logical_adr
+    source_ref: ADR-L-0004#DEC-0021
+    extraction_phase: extract_decision
+    classification: explicit
+    generator: adr-architecture-index
+- id: DEC-0022
+  entity_type: decision
+  name: 'Integration model: substrate provides artifacts, consuming systems perform
+    projection,
+
+    interpretation, validation, and enforcement.
+
+    '
+  summary: Clear separation of concerns. Substrate is a storage and structuring layer.
+    adr-kit extensions project seeds into ADR-PC (deterministic structure + interpretive
+    intent). Conversation engines select seeds based on convers
+  canonical_source:
+    source_type: logical_adr
+    source_ref: ADR-L-0004#DEC-0022
+    artifact_path: adrs/logical/ADR-L-0004-substrate-consumption-and-discovery.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-L-0004
+    related_invariants: []
+    enforces_invariants: []
+    enables_capabilities: []
+    governs_components: []
+    supersedes: []
+    refines: []
+  relationships:
+    declared_in:
+    - ADR-L-0004
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in: []
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: logical_adr
+    source_ref: ADR-L-0004#DEC-0022
+    extraction_phase: extract_decision
+    classification: explicit
+    generator: adr-architecture-index
+- id: DEC-0023
+  entity_type: decision
+  name: Substrate does not provide HTTP API, service endpoints, or runtime query interfaces.
+  summary: File-based consumption is sufficient for STE ecosystem use cases and avoids
+    operational complexity (no service to deploy, monitor, scale). Consuming systems
+    are local tools (adr CLI, ste CLI, conversation engine plugins)
+  canonical_source:
+    source_type: logical_adr
+    source_ref: ADR-L-0004#DEC-0023
+    artifact_path: adrs/logical/ADR-L-0004-substrate-consumption-and-discovery.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-L-0004
+    related_invariants: []
+    enforces_invariants: []
+    enables_capabilities: []
+    governs_components: []
+    supersedes: []
+    refines: []
+  relationships:
+    declared_in:
+    - ADR-L-0004
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in: []
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: logical_adr
+    source_ref: ADR-L-0004#DEC-0023
+    extraction_phase: extract_decision
+    classification: explicit
+    generator: adr-architecture-index
+- id: DEC-0024
+  entity_type: decision
+  name: 'The discovery surface MUST be generated from corpus metadata files.
+
+    Discovery files MUST NOT be hand-authored as primary artifacts.
+
+    '
+  summary: 'Hand-authored discovery creates drift risk: a contributor adds a building
+    block but forgets to update three discovery files. Generated discovery eliminates
+    the the category of "corpus added, index stale" errors by making'
+  canonical_source:
+    source_type: logical_adr
+    source_ref: ADR-L-0005#DEC-0024
+    artifact_path: adrs/logical/ADR-L-0005-corpus-maintenance-and-discovery-sync.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-L-0005
+    related_invariants: []
+    enforces_invariants: []
+    enables_capabilities: []
+    governs_components: []
+    supersedes: []
+    refines: []
+  relationships:
+    declared_in:
+    - ADR-L-0005
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in: []
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: logical_adr
+    source_ref: ADR-L-0005#DEC-0024
+    extraction_phase: extract_decision
+    classification: explicit
+    generator: adr-architecture-index
+- id: DEC-0025
+  entity_type: decision
+  name: 'A corpus sync command MUST regenerate the complete discovery surface
+
+    (index, manifest, all registries) from a single invocation.
+
+    '
+  summary: 'Partial regeneration (e.g., sync only the seeds registry) leaves the system
+    in an inconsistent intermediate state. A single sync guarantees full consistency
+    in one operation. The cost of regenerating the full surface is '
+  canonical_source:
+    source_type: logical_adr
+    source_ref: ADR-L-0005#DEC-0025
+    artifact_path: adrs/logical/ADR-L-0005-corpus-maintenance-and-discovery-sync.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-L-0005
+    related_invariants: []
+    enforces_invariants: []
+    enables_capabilities: []
+    governs_components: []
+    supersedes: []
+    refines: []
+  relationships:
+    declared_in:
+    - ADR-L-0005
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in: []
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: logical_adr
+    source_ref: ADR-L-0005#DEC-0025
+    extraction_phase: extract_decision
+    classification: explicit
+    generator: adr-architecture-index
+- id: DEC-0026
+  entity_type: decision
+  name: 'A corpus check command MUST verify bidirectional integrity between the
+
+    discovery index and the corpus filesystem, and MUST exit non-zero on drift.
+
+    '
+  summary: 'Bidirectional: (1) every entry in the index must resolve to a real file
+    on disk; (2) every artifact on disk must appear in the index. One-directional
+    checks (index-to-disk only) miss the case where an artifact is added t'
+  canonical_source:
+    source_type: logical_adr
+    source_ref: ADR-L-0005#DEC-0026
+    artifact_path: adrs/logical/ADR-L-0005-corpus-maintenance-and-discovery-sync.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-L-0005
+    related_invariants: []
+    enforces_invariants: []
+    enables_capabilities: []
+    governs_components: []
+    supersedes: []
+    refines: []
+  relationships:
+    declared_in:
+    - ADR-L-0005
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in: []
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: logical_adr
+    source_ref: ADR-L-0005#DEC-0026
+    extraction_phase: extract_decision
+    classification: explicit
+    generator: adr-architecture-index
+- id: DEC-0027
+  entity_type: decision
+  name: 'Corpus check MUST be wired as a repo contract guard: either a pre-push hook
+
+    or a CI gate that runs on every commit touching corpus/ or discovery/.
+
+    '
+  summary: Matches the workspace AGENTS.md contract guard rule (generated artifacts
+    require a contract guard command). A pre-push hook provides local enforcement
+    before push; CI provides enforcement for pull requests and direct pus
+  canonical_source:
+    source_type: logical_adr
+    source_ref: ADR-L-0005#DEC-0027
+    artifact_path: adrs/logical/ADR-L-0005-corpus-maintenance-and-discovery-sync.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-L-0005
+    related_invariants: []
+    enforces_invariants: []
+    enables_capabilities: []
+    governs_components: []
+    supersedes: []
+    refines: []
+  relationships:
+    declared_in:
+    - ADR-L-0005
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in: []
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: logical_adr
+    source_ref: ADR-L-0005#DEC-0027
+    extraction_phase: extract_decision
+    classification: explicit
+    generator: adr-architecture-index
+- id: DEC-0028
+  entity_type: decision
+  name: 'Corpus tooling MUST be executable without package installation: a standalone
+
+    Python script runnable with the repo''s standard Python environment.
+
+    '
+  summary: A fork-friendly repo cannot assume pip-installable tooling is pre-installed.
+    A standalone script in tools/ lowers the barrier for forked organizations and
+    aligns with the "no ceremony" ethos of the project. If the tool m
+  canonical_source:
+    source_type: logical_adr
+    source_ref: ADR-L-0005#DEC-0028
+    artifact_path: adrs/logical/ADR-L-0005-corpus-maintenance-and-discovery-sync.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-L-0005
+    related_invariants: []
+    enforces_invariants: []
+    enables_capabilities: []
+    governs_components: []
+    supersedes: []
+    refines: []
+  relationships:
+    declared_in:
+    - ADR-L-0005
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in: []
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: logical_adr
+    source_ref: ADR-L-0005#DEC-0028
+    extraction_phase: extract_decision
+    classification: explicit
+    generator: adr-architecture-index
+- id: DEC-0029
+  entity_type: decision
+  name: 'Corpus tooling MUST NOT write to corpus/; it MUST only read corpus/ and
+
+    write discovery/.
+
+    '
+  summary: The corpus artifacts (metadata.json, templates, mutation-rules.yaml) are
+    the authoritative source of truth. Tooling that modifies them would violate the
+    authority model defined in ADR-L-0002. Discovery is the only writab
+  canonical_source:
+    source_type: logical_adr
+    source_ref: ADR-L-0005#DEC-0029
+    artifact_path: adrs/logical/ADR-L-0005-corpus-maintenance-and-discovery-sync.yaml
+  source_refs: []
+  metadata:
+    adr_id: ADR-L-0005
+    related_invariants: []
+    enforces_invariants: []
+    enables_capabilities: []
+    governs_components: []
+    supersedes: []
+    refines: []
+  relationships:
+    declared_in:
+    - ADR-L-0005
+    references: []
+    related_to: []
+    enforces: []
+    enabled_by: []
+    enables: []
+    governs: []
+    implemented_by: []
+    embodied_in: []
+    supersedes: []
+    superseded_by: []
+    refines: []
+  completeness:
+    status: complete
+    missing_fields: []
+  provenance:
+    source_type: logical_adr
+    source_ref: ADR-L-0005#DEC-0029
     extraction_phase: extract_decision
     classification: explicit
     generator: adr-architecture-index

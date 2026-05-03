@@ -1,0 +1,19 @@
+immutable:
+  # Pool schema cannot be changed after user pool creation
+  - UserPool.Properties.Schema
+  # Trust policy for any roles must not be replaced
+  - UserPoolDomain.Properties.Domain
+
+append_only:
+  - UserPool.Properties.AutoVerifiedAttributes
+  - UserPoolClient.Properties.AllowedOAuthScopes
+  - UserPoolClient.Properties.SupportedIdentityProviders
+
+required:
+  - UserPool
+  - UserPoolDomain
+  - UserPoolClient
+
+metadata:
+  description: Cognito auth bundle mutation rules
+  enforcement_level: required
