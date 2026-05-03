@@ -188,15 +188,97 @@ This opens the door to:
 
 ---
 
+## Repository structure
+
+```
+adrs/                 Governance — architecture decisions, constraints, invariants
+  logical/            ADR-L: capabilities, boundaries, contracts
+  physical-system/    ADR-PS: system-scale physical design
+  physical-component/ ADR-PC: implementation-ready component specs
+  index/              Generated: entity registries, architecture index
+  rendered/           Generated: markdown renders of each ADR
+
+corpus/               The patterns this substrate owns
+  seeds/              Complete architecture starting states
+    reference-webapp/   CloudFront + S3 + WAF + API GW + Lambda + Cognito + DynamoDB
+  building-blocks/    Reusable, composable components
+    static-site-delivery/
+    serverless-api/
+    cognito-auth/
+  primitives/         Minimal, low-level IaC constructs
+    s3-secure-bucket/
+    lambda-execution-role/
+    lambda-function/
+
+discovery/            Machine-readable catalog surface
+  substrate-index.json      Entry point for tools and agents
+  substrate-manifest.yaml   Human-readable summary
+  registries/               Per-type artifact registries
+
+schemas/              JSON Schema contracts for all artifact types
+  cloudformation/     Technology-specific extension schemas
+
+tools/                Corpus maintenance CLI (corpus sync / validate / check)
+
+fixtures/             Local development fixtures (gitignored vendor templates)
+```
+
+---
+
+## How consumers discover artifacts
+
+**Do not browse `corpus/` directly.** Read `discovery/substrate-index.json` — the canonical, machine-readable entry point kept in sync with the corpus by the maintenance tooling.
+
+```json
+{
+  "entries": [
+    { "id": "reference-webapp", "type": "seed",
+      "metadata_file": "corpus/seeds/reference-webapp/metadata.json", ... },
+    { "id": "static-site-delivery", "type": "building_block", ... }
+  ]
+}
+```
+
+Each entry's `metadata_file` resolves to the authoritative artifact descriptor. From there, `cloudformation.templates[].path` (seeds/bundles) or `cloudformation.construct` (primitives) gives the IaC file.
+
+---
+
+## Branching
+
+* **`main`** — stable, release line.
+* **`develop`** — integration branch; created from `main` and kept in sync via PRs.
+* **Feature branches** — branch from **`develop`**, open PRs into **`develop`**.
+
+Promotion flow: work on a feature branch → PR to **`develop`** → when ready to ship, PR **`develop`** → **`main`**.
+
+---
+
 ## Getting started
 
-Explore:
+**Browse available patterns:**
+```bash
+python tools/corpus_cli.py list
+```
 
-* `/seeds/` — complete architecture starting points
-* `/building-blocks/` — reusable components
-* `/schemas/` — artifact definitions
+**Validate all metadata against schemas:**
+```bash
+python tools/corpus_cli.py validate
+```
 
-Start with a seed, then adapt.
+**Install the pre-push contract guard:**
+```bash
+bash tools/install-hooks.sh
+```
+
+**Add a new building block:** see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+---
+
+## Tooling requirements
+
+- Python 3.10+
+- `pip install adr-architecture-kit` (ADR authoring and validation)
+- `pip install jsonschema pyyaml` (corpus tooling and schema validation)
 
 ---
 

@@ -1,0 +1,99 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ste-architecture-substrate.local/schemas/cloudformation/mutation-rules-extension.schema.json",
+  "title": "CloudFormation mutation rules extension",
+  "description": "Additional constraints for CloudFormation mutation rules when using structured rules[].target paths or logical-ID sidecar strings.",
+  "oneOf": [
+    {
+      "title": "Structured rules — CloudFormation targets",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "iac_technology", "rules"],
+      "properties": {
+        "schema_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "iac_technology": {
+          "type": "string",
+          "const": "cloudformation"
+        },
+        "rules": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": true,
+            "required": ["target", "classification"],
+            "properties": {
+              "target": {
+                "type": "string",
+                "minLength": 1,
+                "description": "CloudFormation logical address or property path (technology-specific; see ADR-PC-0005)."
+              },
+              "classification": {
+                "type": "string",
+                "enum": ["immutable", "mutable", "conditional"]
+              },
+              "condition": {},
+              "rationale": {
+                "type": "string"
+              },
+              "severity": {
+                "type": "string",
+                "enum": ["info", "warning", "error"]
+              },
+              "enforcement": {
+                "type": "string",
+                "enum": ["none", "ci", "cfn-hook", "scp"]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "title": "Logical ID sidecar — dot-path segments",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "immutable": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.*]*$"
+          }
+        },
+        "append_only": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.*]*$"
+          }
+        },
+        "required": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.*]*$"
+          }
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "anyOf": [
+        {
+          "required": ["immutable"]
+        },
+        {
+          "required": ["append_only"]
+        },
+        {
+          "required": ["required"]
+        }
+      ]
+    }
+  ]
+}

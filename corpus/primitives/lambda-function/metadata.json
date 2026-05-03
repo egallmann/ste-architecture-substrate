@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0.0",
+  "metadata": {
+    "id": "lambda-function",
+    "name": "Lambda Function",
+    "description": "Lambda function with configurable handler, runtime, code location, and environment variables. No VPC, no layers — extend via composing bundle.",
+    "version": "1.0.0",
+    "technology": "cloudformation"
+  },
+  "cloudformation": {
+    "construct": "template.yaml",
+    "construct_type": "resource"
+  }
+}

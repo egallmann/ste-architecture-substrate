@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.0.0",
+  "metadata": {
+    "id": "serverless-api",
+    "name": "Serverless REST API",
+    "description": "API Gateway REST API with Lambda proxy integration, Cognito authorizer, and DynamoDB access. Includes JWT handler for Cognito token exchange. Extracted from reference-webapp.",
+    "version": "1.0.0",
+    "technology": "cloudformation",
+    "domains": ["api", "serverless", "auth"],
+    "tags": ["apigateway", "lambda", "cognito-authorizer", "dynamodb", "jwt", "proxy"]
+  },
+  "adr_bundle": ["ADR-L-0001", "ADR-PS-0002"],
+  "adr_context_prose": "adr-context.md",
+  "mutation_rules": "mutation-rules.yaml",
+  "dependencies": ["cognito-auth"],
+  "cloudformation": {
+    "template": "template.yaml",
+    "fragment_type": "resources",
+    "required_parameters": {
+      "AppName": {"type": "String", "description": "Name prefix for resources"},
+      "Env": {"type": "String", "description": "Environment name"},
+      "LambdaCodeS3Bucket": {"type": "String", "description": "Bucket containing Lambda packages"},
+      "LambdaCodeS3Key": {"type": "String", "description": "Object key for API handler package"},
+      "JwtLambdaCodeS3Key": {"type": "String", "description": "Object key for JWT handler package"},
+      "CognitoUserPoolArn": {"type": "String", "description": "ARN of Cognito User Pool for authorizer"},
+      "CognitoUserPoolId": {"type": "String", "description": "ID of Cognito User Pool"},
+      "CognitoAppClientId": {"type": "String", "description": "Cognito app client ID"},
+      "CognitoDomainPrefix": {"type": "String", "description": "Cognito hosted UI domain prefix"},
+      "DistributionDomain": {"type": "String", "description": "CloudFront domain for Cognito redirect URI"},
+      "DynamoTableName": {"type": "String", "description": "DynamoDB table name for API handler"}
+    },
+    "exports": {
+      "RestApiId": "API Gateway REST API ID",
+      "RestApiUrl": "API Gateway stage invoke URL",
+      "ApiHandlerFunctionArn": "API handler Lambda ARN",
+      "JwtHandlerFunctionArn": "JWT handler Lambda ARN"
+    }
+  }
+}

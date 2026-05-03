@@ -1,0 +1,113 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ste-architecture-substrate.local/schemas/mutation-rules.schema.json",
+  "title": "Substrate mutation rules (core)",
+  "description": "Core mutation-rules document: either structured rules (iac_technology + rules[]) or logical-ID sidecar lists (immutable / append_only / required). Combine with cloudformation/mutation-rules-extension.schema.json for CFN-specific constraints.",
+  "oneOf": [
+    {
+      "title": "Structured rule list",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "iac_technology", "rules"],
+      "properties": {
+        "schema_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "iac_technology": {
+          "type": "string",
+          "minLength": 1
+        },
+        "rules": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": true,
+            "required": ["target", "classification"],
+            "properties": {
+              "target": {
+                "type": "string",
+                "minLength": 1
+              },
+              "classification": {
+                "type": "string",
+                "enum": ["immutable", "mutable", "conditional"]
+              },
+              "condition": {},
+              "rationale": {
+                "type": "string"
+              },
+              "severity": {
+                "type": "string",
+                "enum": ["info", "warning", "error"]
+              },
+              "enforcement": {
+                "type": "string",
+                "enum": ["none", "ci", "cfn-hook", "scp"]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "title": "Logical ID sidecar (CloudFormation-oriented)",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "immutable": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "append_only": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "anyOf": [
+        {
+          "required": ["immutable"],
+          "properties": {
+            "immutable": {
+              "minItems": 1
+            }
+          }
+        },
+        {
+          "required": ["append_only"],
+          "properties": {
+            "append_only": {
+              "minItems": 1
+            }
+          }
+        },
+        {
+          "required": ["required"],
+          "properties": {
+            "required": {
+              "minItems": 1
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

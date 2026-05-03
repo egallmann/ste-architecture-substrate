@@ -1,0 +1,274 @@
+schema_version: '1.0'
+adr_type: physical-component
+id: ADR-PC-0006
+title: CloudFormation Template Structure Requirements
+status: proposed
+created_date: '2026-05-02'
+authors:
+- Erik Gallmann
+implements_logical:
+- ADR-L-0001
+implements_system:
+- ADR-PS-0002
+domains:
+- cloudformation
+context: |
+  CloudFormation template structural validity defines requirements for template syntax,
+  resource types, property schemas, and AWS service limits. While substrate artifacts
+  (seeds, bundles) do not perform runtime validation, they document structural requirements
+  that external tools (cfn-lint, AWS CloudFormation validation API) enforce.
+  
+  Key validation dimensions:
+  - Syntax: Valid YAML/JSON CloudFormation template
+  - Schema: Resource types and properties match AWS schemas
+  - Limits: AWS service limits (200 resources, 60 outputs, etc.)
+  - References: Intrinsic functions reference valid resources/parameters
+  - Naming: Logical IDs follow CloudFormation conventions
+component_specifications:
+  - id: COMP-0006
+    name: CloudFormation Template Structure
+    type: library
+    responsibilities: |
+      - Define structural validity requirements for CloudFormation templates
+      - Reference cfn-lint validation
+      - Document required sections
+    generation_context:
+      purpose: Define CloudFormation template structural requirements
+      key_responsibilities:
+        - Template structure validation
+        - cfn-lint integration
+        - CloudFormation schema compliance
+      constraints:
+        - Must follow AWS CloudFormation schema
+    interfaces:
+      - id: IFACE-0006
+        type: library_api
+        specification: |
+          CloudFormation Template Structure Requirements:
+          
+          1. Required Sections:
+          ```yaml
+          AWSTemplateFormatVersion: '2010-09-09'  # REQUIRED
+          Description: string (max 1024 chars)     # Optional but recommended
+          
+          Resources:                                # REQUIRED, non-empty
+            LogicalId:
+              Type: AWS::Service::ResourceType     # REQUIRED
+              Properties:                           # Resource-specific
+                PropertyName: value
+          ```
+          
+          2. Optional Sections:
+          ```yaml
+          Parameters:
+            ParameterName:
+              Type: String|Number|List<Number>|CommaDelimitedList|AWS-specific
+              Description: string
+              Default: value
+              AllowedValues: [list]
+              ConstraintDescription: string
+          
+          Mappings:
+            MappingName:
+              Key:
+                Name: value
+          
+          Conditions:
+            ConditionName: !Equals [value1, value2]
+          
+          Outputs:
+            OutputName:
+              Description: string
+              Value: value
+              Export:
+                Name: string
+          ```
+          
+          3. Structural Validation Rules (cfn-lint):
+          
+          Resource Type Validation:
+          - All resource types must exist in AWS schema (AWS::EC2::Instance, AWS::S3::Bucket, etc.)
+          - Custom resources must use AWS::CloudFormation::CustomResource or AWS::Serverless::*
+          - Resource properties must match type-specific schemas
+          
+          Example Invalid:
+          ```yaml
+          Resources:
+            MyBucket:
+              Type: AWS::S3::InvalidType  # ← Error: Unknown resource type
+          ```
+          
+          Property Validation:
+          - Required properties must be present
+          - Property names must match schema exactly (case-sensitive)
+          - Property values must match type constraints
+          
+          Example Invalid:
+          ```yaml
+          Resources:
+            MyInstance:
+              Type: AWS::EC2::Instance
+              Properties:
+                # Missing required InstanceType property
+                ImageId: ami-12345678
+          ```
+          
+          Reference Validation:
+          - !Ref must reference existing resources, parameters, or pseudo-parameters
+          - !GetAtt must reference valid resource attributes
+          - !Sub variables must reference valid resources/parameters
+          
+          Example Invalid:
+          ```yaml
+          Resources:
+            MyInstance:
+              Type: AWS::EC2::Instance
+              Properties:
+                SubnetId: !Ref NonExistentSubnet  # ← Error: Undefined resource
+          ```
+          
+          4. AWS Service Limits:
+          - Max 200 resources per template
+          - Max 60 outputs per template
+          - Max 200 parameters per template
+          - Max 100 mappings per template
+          - Max 51,200 bytes template body size
+          
+          5. Naming Conventions:
+          - Logical IDs: Alphanumeric, no spaces, max 255 chars
+          - Export names: Unique per region/account, no colons
+          - Parameter names: Alphanumeric and periods only
+          
+          6. cfn-lint Integration:
+          
+          Basic validation:
+          ```bash
+          cfn-lint template.yaml
+          ```
+          
+          With rules:
+          ```bash
+          cfn-lint template.yaml \
+            --ignore-checks W3002 \  # Ignore specific warnings
+            --regions us-east-1      # Validate for specific region
+          ```
+          
+          Common cfn-lint rules:
+          - E0000: Template format error
+          - E1001: Duplicate resource found
+          - E2001: Parameter type invalid
+          - E3001: Property type invalid
+          - E3002: Property is required
+          - W2001: Parameter not used
+          - W3002: Property not recommended
+          
+          7. AWS CloudFormation Validation API:
+          
+          ```bash
+          aws cloudformation validate-template \
+            --template-body file://template.yaml
+          ```
+          
+          Returns:
+          - Parameters detected
+          - Capabilities required
+          - Description
+          - Validation errors
+          
+          8. Example Valid Template:
+          ```yaml
+          AWSTemplateFormatVersion: '2010-09-09'
+          Description: Example valid CloudFormation template
+          
+          Parameters:
+            Environment:
+              Type: String
+              AllowedValues: [dev, staging, prod]
+              Description: Environment name
+          
+          Resources:
+            SecureBucket:
+              Type: AWS::S3::Bucket
+              Properties:
+                BucketName: !Sub '${Environment}-secure-bucket-${AWS::AccountId}'
+                BucketEncryption:
+                  ServerSideEncryptionConfiguration:
+                    - ServerSideEncryptionByDefault:
+                        SSEAlgorithm: AES256
+                PublicAccessBlockConfiguration:
+                  BlockPublicAcls: true
+                  BlockPublicPolicy: true
+                  IgnorePublicAcls: true
+                  RestrictPublicBuckets: true
+          
+          Outputs:
+            BucketName:
+              Description: Name of the S3 bucket
+              Value: !Ref SecureBucket
+              Export:
+                Name: !Sub '${AWS::StackName}-BucketName'
+          ```
+          
+          Validation Workflow:
+          1. Syntax check: YAML/JSON parser
+          2. Schema check: cfn-lint with AWS schemas
+          3. Reference check: Validate !Ref, !GetAtt, !Sub
+          4. Limits check: Count resources, outputs, parameters
+          5. API check: aws cloudformation validate-template
+          6. Deployment check: Create change set (optional)
+    implementation_identifiers:
+      module_path: docs/cloudformation-template-requirements.md
+    implementation_requirements:
+      error_handling:
+        strategy: Document validation requirements
+      observability:
+        logging:
+          level: info
+          structured: false
+        metrics:
+          - name: template_structure_checks_total
+            type: counter
+      testing_requirements:
+        unit_test_coverage: '>= 80%'
+technology_stack:
+  - category: infrastructure
+    name: AWS CloudFormation
+    version: N/A
+    rationale: Target platform
+  - category: tooling
+    name: cfn-lint
+    version: 0.70+
+    rationale: Validation tool
+deployment_model:
+  validation: External to substrate
+system_boundaries:
+  - id: COMPBOUND-0006
+    name: Template Structure Boundary
+    description: CloudFormation template validity
+    external_dependencies:
+      - AWS CloudFormation schema
+implementation_decisions:
+  - id: IMPL-0009
+    summary: Document validation requirements without implementing validators
+    rationale: |
+      Leverages existing tooling (cfn-lint, AWS validation API) rather than duplicating
+      validation logic. Substrate focuses on artifact structure and discovery, not runtime
+      validation.
+  - id: IMPL-0010
+    summary: Reference cfn-lint as recommended validation tool
+    rationale: |
+      cfn-lint is open-source, actively maintained, supports custom rules, and provides
+      detailed error messages aligned with AWS best practices.
+constraints:
+  - id: CONST-0009
+    type: technical
+    description: Templates in seeds and bundles should pass cfn-lint validation
+    rationale: Ensures templates are deployable and follow AWS best practices
+  - id: CONST-0010
+    type: technical
+    description: Templates must use AWSTemplateFormatVersion 2010-09-09
+    rationale: This is the only valid template format version recognized by CloudFormation
+non_goals:
+  - Substrate does not validate templates at runtime (external tool responsibility)
+  - Does not implement custom CloudFormation syntax parser
+  - Does not validate template semantics (e.g., security best practices beyond structure)

@@ -1,0 +1,67 @@
+schema_version: '1.0'
+adr_type: physical-component
+id: ADR-PC-0004
+title: CloudFormation Primitive Block Structure
+status: proposed
+created_date: '2026-05-02'
+authors:
+- Erik Gallmann
+implements_logical:
+- ADR-L-0001
+implements_system:
+- ADR-PS-0002
+domains:
+- cloudformation
+context: |
+  Defines minimal CloudFormation primitives without ADR context.
+component_specifications:
+  - id: COMP-0004
+    name: CloudFormation Primitive
+    type: library
+    responsibilities: |
+      - Define minimal CloudFormation primitive structure
+      - Exclude ADR context and mutation rules
+      - Single template only
+    generation_context:
+      purpose: Define minimal CloudFormation primitive structure
+      key_responsibilities:
+        - Minimal template structure
+        - No ADR context
+        - No mutation rules
+      constraints:
+        - Must be valid CloudFormation
+    interfaces:
+      - id: IFACE-0004
+        type: library_api
+        specification: |
+          Single file: template.yaml (CloudFormation template only)
+    implementation_identifiers:
+      module_path: schemas/cloudformation-primitive.schema.json
+    implementation_requirements:
+      error_handling:
+        strategy: Schema validation errors
+      observability:
+        logging:
+          level: info
+          structured: false
+        metrics:
+          - name: primitive_validations_total
+            type: counter
+      testing_requirements:
+        unit_test_coverage: '>= 80%'
+technology_stack:
+  - category: infrastructure
+    name: AWS CloudFormation
+    version: N/A
+    rationale: Primary IaC technology
+deployment_model:
+  storage: primitives/ directory
+system_boundaries:
+  - id: COMPBOUND-0004
+    name: CloudFormation Primitive Boundary
+    description: Minimal CloudFormation constructs
+    external_dependencies:
+      - AWS CloudFormation schema
+non_goals:
+  - No ADR context
+  - No mutation rules

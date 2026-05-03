@@ -1,0 +1,108 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ste-architecture-substrate.local/schemas/seed.schema.json",
+  "title": "Substrate seed artifact (core)",
+  "description": "Technology-agnostic core fields for architecture seeds. Combine with a technology extension (e.g. cloudformation/seed-extension.schema.json) using JSON Schema allOf.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["metadata"],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "description": "Semantic version of this artifact document shape."
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "version", "technology"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+",
+          "description": "Semantic version (major.minor.patch)."
+        },
+        "technology": {
+          "type": "string",
+          "description": "IaC technology discriminator (extension schemas constrain allowed values)."
+        },
+        "domains": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "description": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "deprecated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "migration_guidance": {
+          "type": "string"
+        }
+      }
+    },
+    "adr_bundle": {
+      "type": "array",
+      "description": "Paths or identifiers for ADR artifacts bundled with this seed (ADR-PS-0002).",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "mutation_rules": {
+      "type": "string",
+      "description": "Relative path to mutation rules sidecar (technology-specific format)."
+    },
+    "composition": {
+      "type": "array",
+      "description": "Explicit composition manifest referencing building blocks (ADR-PS-0004).",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["block_id", "version"],
+        "properties": {
+          "block_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version": {
+            "type": "string",
+            "minLength": 1
+          },
+          "optional": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "cloudformation": {
+      "type": "object",
+      "description": "Technology-specific CloudFormation namespace; validate shape with cloudformation/seed-extension.schema.json.",
+      "additionalProperties": true
+    }
+  }
+}

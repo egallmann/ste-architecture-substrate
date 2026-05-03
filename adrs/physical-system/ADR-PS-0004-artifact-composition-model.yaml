@@ -1,0 +1,162 @@
+schema_version: '1.0'
+adr_type: physical-system
+id: ADR-PS-0004
+title: Artifact Composition Model
+status: proposed
+created_date: '2026-05-02'
+authors:
+- Erik Gallmann
+implements_logical:
+- ADR-L-0001
+domains:
+- architecture
+- composition
+
+context: |
+  Architecture seeds are complete starting architectures, building block bundles
+  are reusable components, and primitive blocks are low-level constructs. This
+  ADR defines how these artifacts compose: seeds compose building blocks, blocks
+  may reference primitives, dependency resolution, versioning, and metadata for
+  discovery.
+
+technology_stack:
+  - category: tooling
+    name: Semantic Versioning
+    version: 2.0.0
+    rationale: Artifact versioning and compatibility model
+  - category: tooling
+    name: YAML
+    version: N/A
+    rationale: Composition manifest serialization
+
+system_architecture:
+  components:
+    - id: COMP-0009
+      name: Seed Composition
+      type: composition
+      description: |
+        Seeds are composed from one or more building blocks with explicit composition manifest
+      responsibilities:
+        - Define composition field structure (array of block references)
+        - Support explicit block selection (id-based references)
+        - Enable composition documentation in ADR bundle
+      interfaces:
+        - composition: [{block_id, version, optional_overrides}, ...]
+        
+    - id: COMP-0010
+      name: Block Independence
+      type: capability
+      description: |
+        Building blocks can be used independently or as seed components
+      responsibilities:
+        - Blocks are self-contained with complete IaC and mutation rules
+        - Blocks declare dependencies on other blocks (optional)
+        - Blocks can be composed without seeds
+      interfaces:
+        - dependencies: [{block_id, version}, ...]
+        
+    - id: COMP-0011
+      name: Primitive Fallback
+      type: capability
+      description: |
+        Primitive blocks provide low-level constructs when higher-level abstractions unavailable
+      responsibilities:
+        - Primitives are minimal (no ADR context, no mutation rules)
+        - Primitives enable fine-grained composition
+        - Primitives support technology-specific low-level construction
+      interfaces:
+        - Referenced by blocks or seeds when needed
+
+  composition_patterns:
+    seed_from_blocks:
+      description: Seed explicitly composes building blocks
+      example: |
+        seed:
+          id: SEED-0001
+          name: Serverless API
+          composition:
+            - block_id: BLOCK-0001  # API Gateway + Lambda
+              version: 1.0.0
+            - block_id: BLOCK-0002  # DynamoDB Table
+              version: 1.2.0
+            - block_id: BLOCK-0003  # CloudWatch Alarms
+              version: 1.0.0
+      
+    block_with_dependencies:
+      description: Block declares dependencies on other blocks
+      example: |
+        building_block:
+          id: BLOCK-0001
+          name: API Gateway with Lambda
+          dependencies:
+            - block_id: BLOCK-0010  # Lambda execution role
+              version: 1.0.0
+      
+    block_with_primitives:
+      description: Block references primitives for low-level construction
+      example: |
+        building_block:
+          id: BLOCK-0002
+          name: DynamoDB Table
+          # References primitives in IaC template, not in composition field
+
+  dependency_resolution:
+    model: Consuming systems resolve dependencies, not substrate
+    approach: |
+      1. Consumer reads seed with composition field
+      2. Consumer retrieves each referenced building block
+      3. Consumer resolves transitive dependencies (block → block → primitive)
+      4. Consumer validates version compatibility
+      5. Consumer projects composed IaC structure
+
+  versioning_model:
+    scheme: Semantic versioning (major.minor.patch)
+    rules:
+      - Major version changes: breaking changes to IaC structure or mutation rules
+      - Minor version changes: additive changes (new resources, new optional parameters)
+      - Patch version changes: fixes with no structural changes
+    compatibility: |
+      Consumers may enforce version constraints (e.g., block_id: BLOCK-0001, version: ^1.0.0).
+      Substrate does not enforce - version matching is consumer responsibility.
+
+  metadata_for_discovery:
+    fields:
+      - domains: Architecture domains (api, database, observability, security)
+      - tags: Discovery tags (serverless, production-ready, experimental)
+      - technology: IaC technology (cloudformation, terraform, etc.)
+      - dependencies: Declared dependencies enable dependency graph visualization
+    purpose: |
+      Rich metadata enables filtering (show me all serverless building blocks),
+      technology routing (CloudFormation-only), and dependency analysis.
+
+  deprecation_model:
+    approach: |
+      Artifacts include optional deprecated_at timestamp and migration_guidance.
+      Consuming systems warn on deprecated artifact usage. Substrate does not
+      prevent deprecated artifact retrieval.
+
+system_boundaries:
+  - id: SYSBOUND-0004
+    name: Composition Model Boundary
+    description: |
+      Defines artifact composition, versioning, and dependency declaration.
+      Dependency resolution and version conflict handling are external to substrate.
+    external_dependencies:
+      - Consuming systems for dependency resolution
+      - Semantic versioning for compatibility model
+
+usage_flow: |
+  1. Consumer selects seed by filtering on domains/tags
+  2. Consumer reads seed composition field
+  3. Consumer retrieves building blocks referenced in composition
+  4. Consumer resolves transitive block dependencies
+  5. Consumer retrieves primitives if referenced by blocks
+  6. Consumer projects composed IaC structure (deterministic)
+  7. Consumer merges mutation rules from all components
+  8. Consumer generates composite ADR-PC from seed + block ADR context
+
+non_goals:
+  - Substrate does not perform composition (consumers compose)
+  - Substrate does not validate dependency cycles
+  - Substrate does not resolve version conflicts
+  - Substrate does not enforce deprecation (warns only)

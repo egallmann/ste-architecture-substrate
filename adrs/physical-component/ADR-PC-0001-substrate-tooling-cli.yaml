@@ -1,0 +1,145 @@
+schema_version: '1.0'
+adr_type: physical-component
+id: ADR-PC-0001
+title: Substrate Tooling CLI
+status: proposed
+created_date: '2026-05-02'
+authors:
+- Erik Gallmann
+implements_logical:
+- ADR-L-0001
+implements_system:
+- ADR-PS-0001
+domains:
+- tooling
+context: |
+  The substrate CLI provides commands for discovering, retrieving, validating, and compiling
+  architecture substrate artifacts. It implements the tooling interface defined in ADR-PS-0001
+  for local artifact management and discovery bundle generation.
+  
+  Primary use cases:
+  - Search for seeds, bundles, or primitives by technology
+  - Retrieve specific seed artifacts for project initialization
+  - Validate artifact structure and schemas
+  - Compile discovery bundles for consumption by other tools
+  - Initialize new substrate projects
+component_specifications:
+  - id: COMP-0001
+    name: substrate CLI
+    type: service
+    responsibilities: |
+      - Manage substrate artifacts (search, get, validate)
+      - Generate discovery bundles
+      - Initialize substrate projects
+    generation_context:
+      purpose: Provide CLI for artifact management and discovery
+      key_responsibilities:
+        - Manage substrate artifacts
+        - Generate discovery bundles
+      constraints:
+        - File-based operations only
+    interfaces:
+      - id: IFACE-0001
+        type: CLI
+        specification: |
+          Command structure and examples:
+          
+          1. substrate search [options]
+             Search for substrate artifacts
+             Options:
+               --type seed|bundle|primitive  Filter by artifact type
+               --tech cloudformation         Filter by technology
+               --json                        Output as JSON
+             Examples:
+               substrate search --type seed --tech cloudformation
+               substrate search --type bundle
+          
+          2. substrate get-seed <id> [options]
+             Retrieve a specific seed artifact
+             Options:
+               --output <path>              Output directory (default: ./seeds/<id>)
+               --dry-run                    Show what would be retrieved
+             Examples:
+               substrate get-seed vpc-baseline
+               substrate get-seed vpc-baseline --output ./my-seeds/
+          
+          3. substrate validate <path> [options]
+             Validate artifact structure and schemas
+             Options:
+               --type seed|bundle|primitive  Artifact type to validate
+               --strict                      Enable strict validation
+             Examples:
+               substrate validate ./seeds/vpc-baseline/
+               substrate validate ./building-blocks/s3-bucket/ --type bundle
+          
+          4. substrate compile [options]
+             Generate discovery bundles
+             Options:
+               --output <path>              Output directory (default: ./discovery/)
+               --include-schemas            Include JSON schemas in bundle
+             Examples:
+               substrate compile
+               substrate compile --output ./dist/discovery/
+          
+          5. substrate init [options]
+             Initialize new substrate project
+             Options:
+               --tech cloudformation        Technology to initialize
+               --type seed|bundle|primitive  Artifact type to create
+               --name <name>                Artifact name
+             Examples:
+               substrate init --tech cloudformation --type seed --name my-vpc
+               substrate init --tech cloudformation --type bundle --name s3-bucket
+    implementation_identifiers:
+      module_path: src/cli/substrate_cli.py
+      entry_point: src/cli/substrate_cli.py
+      test_path: tests/cli/
+    implementation_requirements:
+      error_handling:
+        strategy: Exit with non-zero status on errors; actionable error messages
+      observability:
+        logging:
+          level: info
+          structured: false
+        metrics:
+          - name: substrate_cli_commands_total
+            type: counter
+      testing_requirements:
+        unit_test_coverage: '>= 80%'
+technology_stack:
+  - category: language
+    name: Python
+    version: 3.10+
+    rationale: Implementation language
+deployment_model:
+  installation: pip install ste-architecture-substrate
+system_boundaries:
+  - id: COMPBOUND-0001
+    name: CLI Boundary
+    description: Local artifact management
+    external_dependencies:
+      - File system
+implementation_decisions:
+  - id: IMPL-0001
+    summary: Use Click framework for CLI
+    rationale: |
+      Click provides robust argument parsing, automatic help generation, and nested command
+      groups that align with substrate's command structure (search, get-seed, validate, etc.)
+  - id: IMPL-0002
+    summary: File-based artifact discovery
+    rationale: |
+      Artifacts are discovered by filesystem traversal and metadata.json parsing rather than
+      requiring a centralized database or API, enabling offline usage and git-based distribution
+constraints:
+  - id: CONST-0001
+    type: technical
+    description: CLI operations must not require network access except for potential future artifact registry integration
+    rationale: Supports offline development workflows
+  - id: CONST-0002
+    type: technical
+    description: All validation must be schema-driven using JSON Schema
+    rationale: Ensures consistency with artifact schemas and enables automated validation
+non_goals:
+  - Does not deploy IaC (deployment is downstream consumer responsibility)
+  - Does not manage artifact versioning (relies on git for version control)
+  - Does not provide artifact transformation or migration tools

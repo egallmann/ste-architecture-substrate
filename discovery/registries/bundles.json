@@ -1,0 +1,39 @@
+{
+  "entries": [
+    {
+      "dependencies": [
+        "static-site-delivery"
+      ],
+      "id": "cognito-auth",
+      "metadata_file": "corpus/building-blocks/cognito-auth/metadata.json",
+      "mutation_rules": "corpus/building-blocks/cognito-auth/mutation-rules.yaml",
+      "name": "Cognito Authentication",
+      "technology": "cloudformation",
+      "template": "corpus/building-blocks/cognito-auth/template.yaml",
+      "version": "1.0.0"
+    },
+    {
+      "dependencies": [
+        "cognito-auth"
+      ],
+      "id": "serverless-api",
+      "metadata_file": "corpus/building-blocks/serverless-api/metadata.json",
+      "mutation_rules": "corpus/building-blocks/serverless-api/mutation-rules.yaml",
+      "name": "Serverless REST API",
+      "technology": "cloudformation",
+      "template": "corpus/building-blocks/serverless-api/template.yaml",
+      "version": "1.0.0"
+    },
+    {
+      "id": "static-site-delivery",
+      "metadata_file": "corpus/building-blocks/static-site-delivery/metadata.json",
+      "mutation_rules": "corpus/building-blocks/static-site-delivery/mutation-rules.yaml",
+      "name": "Static Site Delivery",
+      "technology": "cloudformation",
+      "template": "corpus/building-blocks/static-site-delivery/template.yaml",
+      "version": "1.0.0"
+    }
+  ],
+  "registry": "bundles",
+  "schema_version": "1.0.0"
+}

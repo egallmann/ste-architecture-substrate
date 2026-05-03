@@ -1,0 +1,69 @@
+schema_version: '1.0'
+adr_type: physical-component
+id: ADR-PC-0007
+title: CloudFormation Stack Policy Integration
+status: proposed
+created_date: '2026-05-02'
+authors:
+- Erik Gallmann
+implements_logical:
+- ADR-L-0003
+implements_system:
+- ADR-PS-0002
+domains:
+- cloudformation
+- governance
+context: |
+  Defines how seeds reference CloudFormation stack policies for operational enforcement.
+component_specifications:
+  - id: COMP-0007
+    name: Stack Policy Integration
+    type: library
+    responsibilities: |
+      - Define stack policy integration for seeds
+      - Reference stack policy files
+      - Document enforcement semantics
+    generation_context:
+      purpose: Define CloudFormation stack policy integration
+      key_responsibilities:
+        - Stack policy reference field
+        - Deployment-time enforcement
+        - Mutation rule alignment
+      constraints:
+        - Stack policy is optional
+    interfaces:
+      - id: IFACE-0007
+        type: library_api
+        specification: |
+          Seed cloudformation.stack_policy field:
+          - Optional string path to stack policy JSON
+          - Applied during stack create/update
+    implementation_identifiers:
+      module_path: schemas/cloudformation-seed.schema.json
+    implementation_requirements:
+      error_handling:
+        strategy: Schema validation for stack policy format
+      observability:
+        logging:
+          level: info
+          structured: false
+        metrics:
+          - name: stack_policy_references_total
+            type: counter
+      testing_requirements:
+        unit_test_coverage: '>= 80%'
+technology_stack:
+  - category: infrastructure
+    name: AWS CloudFormation
+    version: N/A
+    rationale: Target platform
+deployment_model:
+  reference: cloudformation.stack_policy field
+system_boundaries:
+  - id: COMPBOUND-0007
+    name: Stack Policy Boundary
+    description: Stack policy integration
+    external_dependencies:
+      - CloudFormation stack policy schema
+non_goals:
+  - Substrate does not enforce policies
