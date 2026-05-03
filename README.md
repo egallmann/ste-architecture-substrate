@@ -188,6 +188,16 @@ This opens the door to:
 
 ---
 
+## Branching
+
+* **`main`** — stable, release line.
+* **`develop`** — integration branch; created from `main` and kept in sync via PRs.
+* **Feature branches** — branch from **`develop`**, open PRs into **`develop`**.
+
+Promotion flow: work on a feature branch → PR to **`develop`** → when ready to ship, PR **`develop`** → **`main`**.
+
+---
+
 ## Getting started
 
 Explore:
